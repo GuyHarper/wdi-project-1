@@ -2,6 +2,7 @@ $(() => {
 
   const $gameArea = $('.game-area');
   const $button = $('button');
+  let arrowId = 0;
 
   $button.on('click', () => {
     arrowProcess();
@@ -9,6 +10,8 @@ $(() => {
 
   function createArrow(direction) {
     const $newArrow = $('<div class="arrow"></div>');
+    arrowId++;
+    $newArrow.data('id', arrowId);
     $gameArea.append($newArrow);
     $newArrow.addClass(direction);
     $newArrow.css({top: 360});
