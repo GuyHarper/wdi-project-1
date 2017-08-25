@@ -1,3 +1,5 @@
+@import "variables";
+
 body {
   background-color: #fff;
   color: #000;
@@ -12,17 +14,32 @@ div {
   &.game-area {
     position: relative;
     margin-top: 100px;
-    width: 600px;
-    height: 400px;
+    width: $game-width;
+    height: $game-height;
     border: 2px solid #000;
   }
   &.arrow {
     position: absolute;
     width: 80px;
     height: 40px;
-    background-image: url('../images/right-arrow-icon-black.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    &.left {
+      background-image: url('../images/left-arrow-icon-black.png');
+      left: ($game-width * 2/3 - 80px) * 1/8 + $game-width/6;
+    }
+    &.up {
+      background-image: url('../images/up-arrow-icon-black.png');
+      left: ($game-width * 2/3 - 80px) * 3/8 + $game-width/6;
+    }
+    &.down {
+      background-image: url('../images/down-arrow-icon-black.png');
+      left: ($game-width * 2/3 - 80px) * 5/8 + $game-width/6;
+    }
+    &.right {
+      background-image: url('../images/right-arrow-icon-black.png');
+      left: ($game-width * 2/3 - 80px) * 7/8 + $game-width/6;
+    }
   }
 }

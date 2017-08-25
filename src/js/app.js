@@ -7,15 +7,17 @@ $(() => {
     arrowProcess();
   });
 
-  function createArrow() {
+  function createArrow(direction) {
     const $newArrow = $('<div class="arrow"></div>');
     $gameArea.append($newArrow);
-    $newArrow.css({top: 360, left: 260});
+    $newArrow.addClass(direction);
+    $newArrow.css({top: 360});
     return $newArrow;
   }
 
   function arrowProcess() {
-    const $newArrow = createArrow();
+    const directions = ['left','up','right','down'];
+    const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
       moveArrow($newArrow);
       if($newArrow.position().top === 0) {
