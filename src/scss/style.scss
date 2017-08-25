@@ -1,3 +1,28 @@
 body {
-  background: tomato;
+  background-color: #fff;
+  color: #000;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+}
+
+div {
+  &.game-area {
+    position: relative;
+    margin-top: 100px;
+    width: 600px;
+    height: 400px;
+    border: 2px solid #000;
+  }
+  &.arrow {
+    position: absolute;
+    width: 80px;
+    height: 40px;
+    background-image: url('../images/right-arrow-icon-black.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 }
