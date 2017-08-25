@@ -3,6 +3,7 @@ $(() => {
   const $gameArea = $('.game-area');
   const $button = $('button');
   let arrowId = 0;
+  const arrowsOnScreen = [];
 
   $button.on('click', () => {
     arrowProcess();
@@ -12,6 +13,7 @@ $(() => {
     const $newArrow = $('<div class="arrow"></div>');
     arrowId++;
     $newArrow.data('id', arrowId);
+    arrowsOnScreen.push(arrowId);
     $gameArea.append($newArrow);
     $newArrow.addClass(direction);
     $newArrow.css({top: 360});
@@ -24,6 +26,7 @@ $(() => {
     const timerId = setInterval(function() {
       moveArrow($newArrow);
       if($newArrow.position().top === 0) {
+        arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
         deleteArrow($newArrow);
         clearInterval(timerId);
       }
