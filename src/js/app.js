@@ -2,6 +2,7 @@ $(() => {
 
   const $gameArea = $('.game-area');
   const $button = $('button');
+  const $activeArea = $('.active-area');
   const beatsPerMinute = 120;
   const arrowRate = 4; // Number of beats that arrow is visible on screen
   let arrowId = 0;
