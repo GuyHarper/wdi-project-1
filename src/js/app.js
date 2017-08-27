@@ -3,7 +3,7 @@ $(() => {
   const $gameArea = $('.game-area');
   const $button = $('button');
   const $activeArea = $('.active-area');
-  const beatsPerMinute = 120;
+  const beatsPerMinute = 117;
   const arrowRate = 4; // Number of beats that arrow is visible on screen
   let arrowId = 0;
   const arrowsOnScreen = [];
@@ -23,7 +23,7 @@ $(() => {
       score = 0;
       runTimerId = setInterval(function() {
         arrowProcess();
-      }, 1000 * 120/beatsPerMinute);
+      }, 1000 * 60/beatsPerMinute);
       run = true;
     } else {
       clearInterval(runTimerId);
@@ -44,14 +44,12 @@ $(() => {
     return $newArrow;
   }
 
-
-
   function arrowProcess() {
     const directions = ['left','up','right','down'];
     const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
       moveArrow($newArrow);
-      if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + ($activeArea.height() - $newArrow.height())) && $newArrow.data('active') === false) {
+      if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + $activeArea.height()) && $newArrow.data('active') === false) {
         activate($newArrow);
       }
       if($activeArea.position().top >= $newArrow.position().top && $newArrow.data('active') === true) {
