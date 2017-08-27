@@ -16,7 +16,7 @@ $(() => {
   function createArrow(direction) {
     const $newArrow = $('<div class="arrow"></div>');
     arrowId++;
-    $newArrow.data({id: arrowId, activated: false});
+    $newArrow.data({id: arrowId, active: false});
     arrowsOnScreen.push(arrowId);
     $gameArea.append($newArrow);
     $newArrow.addClass(direction);
@@ -31,11 +31,10 @@ $(() => {
     const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
       moveArrow($newArrow);
-      console.log(arrowsInActiveArea);
-      if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + ($activeArea.height() - $newArrow.height())) && $newArrow.data('activated') === false) {
+      if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + ($activeArea.height() - $newArrow.height())) && $newArrow.data('active') === false) {
         activate($newArrow);
       }
-      if($activeArea.position().top >= $newArrow.position().top && $newArrow.data('activated') === true) {
+      if($activeArea.position().top >= $newArrow.position().top && $newArrow.data('active') === true) {
         deActivate($newArrow);
       }
       if($newArrow.position().top < 1) {
@@ -58,10 +57,11 @@ $(() => {
 
   function activate($arrow) {
     arrowsInActiveArea.push($arrow.data('id'));
-    $arrow.data('activated', true);
+    $arrow.data('active', true);
   }
 
   function deActivate($arrow) {
     arrowsInActiveArea.splice(arrowsInActiveArea.indexOf($arrow.data('id')), 1);
+    $arrow.data('active', false);
   }
 });
