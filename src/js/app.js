@@ -10,6 +10,7 @@ $(() => {
   const arrowsInActiveArea = [];
   let run = false;
   let runTimerId = null;
+  let score = null;
   const keyCodes = {
     37: 'left',
     38: 'up',
@@ -19,6 +20,7 @@ $(() => {
 
   $button.on('click', () => {
     if(run === false) {
+      score = 0;
       runTimerId = setInterval(function() {
         arrowProcess();
       }, 1000 * 120/beatsPerMinute);
@@ -85,6 +87,9 @@ $(() => {
 
   $(window).on('keydown', (e) => {
     const keyPressed = e.which;
-    console.log(arrowsInActiveArea[0].direction, keyCodes[keyPressed]);
+    if(arrowsInActiveArea.length > 0 && arrowsInActiveArea[0].direction === keyCodes[keyPressed]){
+      score++;
+      console.log(score);
+    }
   });
 });
