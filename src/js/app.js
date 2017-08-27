@@ -16,7 +16,9 @@ $(() => {
     arrowsOnScreen.push(arrowId);
     $gameArea.append($newArrow);
     $newArrow.addClass(direction);
-    $newArrow.css({top: 360});
+    const gameHeight = $gameArea.height();
+    const arrowHeight = $newArrow.height();
+    $newArrow.css({top: gameHeight-arrowHeight});
     return $newArrow;
   }
 

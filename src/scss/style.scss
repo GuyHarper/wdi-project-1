@@ -1,45 +1,47 @@
 @import "variables";
 
-body {
+html, body {
   background-color: #fff;
   color: #000;
+  height: 100%;
 }
 
 main {
   display: flex;
+  height: 100%;
   justify-content: center;
+  align-items: center;
 }
 
 div {
   &.game-area {
     position: relative;
-    margin-top: 100px;
     width: $game-width;
     height: $game-height;
     border: 2px solid #000;
   }
   &.arrow {
     position: absolute;
-    width: 80px;
-    height: 40px;
+    width: $arrow-width;
+    height: $arrow-height;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     &.left {
       background-image: url('../images/left-arrow-icon-black.png');
-      left: ($game-width * 2/3 - 80px) * 1/8 + $game-width/6;
+      left: calc((#{$game-width} * 7/10 * 1/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
     &.up {
       background-image: url('../images/up-arrow-icon-black.png');
-      left: ($game-width * 2/3 - 80px) * 3/8 + $game-width/6;
+      left: calc((#{$game-width} * 7/10 * 3/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
     &.down {
       background-image: url('../images/down-arrow-icon-black.png');
-      left: ($game-width * 2/3 - 80px) * 5/8 + $game-width/6;
+      left: calc((#{$game-width} * 7/10 * 5/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
     &.right {
       background-image: url('../images/right-arrow-icon-black.png');
-      left: ($game-width * 2/3 - 80px) * 7/8 + $game-width/6;
+      left: calc((#{$game-width} * 7/10 * 7/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
   }
 }
