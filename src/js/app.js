@@ -2,6 +2,8 @@ $(() => {
 
   const $gameArea = $('.game-area');
   const $button = $('button');
+  const beatsPerMinute = 120;
+  const arrowRate = 4; // Number of beats that arrow is visible on screen
   let arrowId = 0;
   const arrowsOnScreen = [];
 
@@ -27,12 +29,12 @@ $(() => {
     const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
       moveArrow($newArrow);
-      if($newArrow.position().top === 0) {
+      if($newArrow.position().top < 1) {
         arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
         deleteArrow($newArrow);
         clearInterval(timerId);
       }
-    },15);
+    },10);
   }
 
   function deleteArrow($arrow) {
@@ -41,7 +43,7 @@ $(() => {
 
   function moveArrow($arrow) {
     const $arrowY = $arrow.position();
-    $arrow.css({top: $arrowY.top - 1});
+    $arrow.css({top: $arrowY.top - ($gameArea.height() - $arrow.height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
     return $arrowY;
   }
 
