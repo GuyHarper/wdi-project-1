@@ -8,15 +8,31 @@ $(() => {
   let arrowId = 0;
   const arrowsOnScreen = [];
   const arrowsInActiveArea = [];
+  let run = false;
+  let runTimerId = null;
+  const keyCodes = {
+    37: 'left',
+    38: 'up',
+    39: 'right',
+    40: 'down'
+  };
 
   $button.on('click', () => {
-    arrowProcess();
+    if(run === false) {
+      runTimerId = setInterval(function() {
+        arrowProcess();
+      }, 1000 * 120/beatsPerMinute);
+      run = true;
+    } else {
+      clearInterval(runTimerId);
+      run = false;
+    }
   });
 
   function createArrow(direction) {
     const $newArrow = $('<div class="arrow"></div>');
     arrowId++;
-    $newArrow.data({id: arrowId, active: false});
+    $newArrow.data({id: arrowId, active: false, direction: direction});
     arrowsOnScreen.push(arrowId);
     $gameArea.append($newArrow);
     $newArrow.addClass(direction);
@@ -25,6 +41,8 @@ $(() => {
     $newArrow.css({top: gameHeight-arrowHeight});
     return $newArrow;
   }
+
+
 
   function arrowProcess() {
     const directions = ['left','up','right','down'];
@@ -56,12 +74,17 @@ $(() => {
   }
 
   function activate($arrow) {
-    arrowsInActiveArea.push($arrow.data('id'));
+    arrowsInActiveArea.push({id: $arrow.data('id'), direction: $arrow.data('direction')});
     $arrow.data('active', true);
   }
 
   function deActivate($arrow) {
-    arrowsInActiveArea.splice(arrowsInActiveArea.indexOf($arrow.data('id')), 1);
+    arrowsInActiveArea.splice(arrowsInActiveArea.indexOf({id: $arrow.data('id'), direction: $arrow.data('direction')}), 1);
     $arrow.data('active', false);
   }
+
+  $(window).on('keydown', (e) => {
+    const keyPressed = e.which;
+    console.log(arrowsInActiveArea[0].direction, keyCodes[keyPressed]);
+  });
 });
