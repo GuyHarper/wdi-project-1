@@ -4,7 +4,7 @@ $(() => {
   const $button = $('button');
   const $activeArea = $('.active-area');
   const beatsPerMinute = 117;
-  const arrowRate = 4; // Number of beats that arrow is visible on screen
+  const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let arrowId = 0;
   const arrowsOnScreen = [];
   const arrowsInActiveArea = [];
@@ -69,7 +69,7 @@ $(() => {
 
   function moveArrow($arrow) {
     const $arrowY = $arrow.position();
-    $arrow.css({top: $arrowY.top - ($gameArea.height() - $arrow.height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
+    $arrow.css({top: $arrowY.top - ($gameArea.height() - ($activeArea.height() - $arrow.height()/2) - $arrow.height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
     return $arrowY;
   }
 
