@@ -51,11 +51,13 @@ $(() => {
       moveArrow($newArrow);
       if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + $activeArea.height()) && $newArrow.data('active') === false) {
         activate($newArrow);
+        console.log('active');
+        console.log('arrowsInActiveArea[0]:',arrowsInActiveArea[0]);
       }
       if($activeArea.position().top >= $newArrow.position().top && $newArrow.data('active') === true) {
         deActivate($newArrow);
       }
-      if($newArrow.position().top < 1) {
+      if($newArrow.position().top <= 0) {
         arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
         deleteArrow($newArrow);
         clearInterval(timerId);
@@ -79,15 +81,21 @@ $(() => {
   }
 
   function deActivate($arrow) {
-    arrowsInActiveArea.splice(arrowsInActiveArea.indexOf({id: $arrow.data('id'), direction: $arrow.data('direction')}), 1);
+    const index = arrowsInActiveArea.map((e) => {
+      return e.id;
+    }).indexOf($arrow.data('id'));
+    arrowsInActiveArea.splice(index, 1);
     $arrow.data('active', false);
   }
 
   $(window).on('keydown', (e) => {
     const keyPressed = e.which;
     if(arrowsInActiveArea.length > 0 && arrowsInActiveArea[0].direction === keyCodes[keyPressed]){
+      console.log('matched');
       score++;
-      console.log(score);
+      console.log('arrowsInActiveArea[0] before keymatch:', arrowsInActiveArea[0]);
+      arrowsInActiveArea.shift();
+      console.log('arrowsInActiveArea[0] after keymatch:', arrowsInActiveArea[0]);
     }
   });
 });
