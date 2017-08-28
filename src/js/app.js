@@ -94,6 +94,7 @@ $(() => {
       score++;
       console.log(score);
       deActivate($topArrow);
+      deleteArrow($topArrow);
     }
   });
 });
