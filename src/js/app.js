@@ -3,7 +3,7 @@ $(() => {
   const $gameArea = $('.game-area');
   const $button = $('button');
   const $activeArea = $('.active-area');
-  const beatsPerMinute = 117;
+  const beatsPerMinute = 60/*117*/;
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let arrowId = 0;
   const arrowsOnScreen = [];
@@ -51,8 +51,6 @@ $(() => {
       moveArrow($newArrow);
       if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + $activeArea.height()) && $newArrow.data('active') === false) {
         activate($newArrow);
-        console.log('active');
-        console.log('arrowsInActiveArea[0]:',arrowsInActiveArea[0]);
       }
       if($activeArea.position().top >= $newArrow.position().top && $newArrow.data('active') === true) {
         deActivate($newArrow);
@@ -89,12 +87,14 @@ $(() => {
   }
 
   $(window).on('keydown', (e) => {
+    console.log('keypressed');
     const keyPressed = e.which;
-    if(arrowsInActiveArea.length > 0 && arrowsInActiveArea[0].direction === keyCodes[keyPressed]){
+    const $topArrow = $('.arrow');
+    if($topArrow.data('active') && arrowsInActiveArea.length > 0 && $topArrow.data('direction') === keyCodes[keyPressed]){
       console.log('matched');
       score++;
       console.log('arrowsInActiveArea[0] before keymatch:', arrowsInActiveArea[0]);
-      arrowsInActiveArea.shift();
+      deActivate($topArrow);
       console.log('arrowsInActiveArea[0] after keymatch:', arrowsInActiveArea[0]);
     }
   });
