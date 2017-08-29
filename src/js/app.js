@@ -3,6 +3,8 @@ $(() => {
   const $gameArea = $('.game-area');
   const $button = $('button');
   const $activeArea = $('.active-area');
+  const $healthBar = $('.health-bar');
+  let health = 100;
   const audio = document.querySelector('audio');
   const beatsPerMinute = 116.8;
   const lengthOfSong = 426000; // Length of active part of song in milliseconds (from first beat to last beat you want to be displayed)
@@ -25,6 +27,8 @@ $(() => {
   $button.on('click', () => {
     if(run === false) {
       score = 0;
+      health = 100;
+      $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
       arrowProcess();
       runTimerId = setInterval(function() {
         arrowProcess();
@@ -52,7 +56,7 @@ $(() => {
   function createArrow(direction) {
     const $newArrow = $('<div class="arrow"></div>');
     arrowId++;
-    $newArrow.data({id: arrowId, active: false, direction: direction});
+    $newArrow.data({id: arrowId, direction: direction});
     arrowsOnScreen.push(arrowId);
     $gameArea.append($newArrow);
     $newArrow.addClass(direction);
@@ -67,10 +71,10 @@ $(() => {
     const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
       moveArrow($newArrow);
-      if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + $activeArea.height()) && $newArrow.data('active') === false) {
+      if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false) {
         activate($newArrow);
       }
-      if($activeArea.position().top >= $newArrow.position().top && $newArrow.data('active') === true) {
+      if($activeArea.position().top >= $newArrow.position().top && $newArrow.hasClass('active') === true) {
         deActivate($newArrow);
       }
       if($newArrow.position().top <= 0) {
@@ -93,7 +97,7 @@ $(() => {
 
   function activate($arrow) {
     arrowsInActiveArea.push({id: $arrow.data('id'), direction: $arrow.data('direction')});
-    $arrow.data('active', true);
+    $arrow.addClass('active');
   }
 
   function deActivate($arrow) {
@@ -101,14 +105,14 @@ $(() => {
       return e.id;
     }).indexOf($arrow.data('id'));
     arrowsInActiveArea.splice(index, 1);
-    $arrow.data('active', false);
+    $arrow.removeClass('active');
   }
 
   $(window).on('keydown', (e) => {
     console.log('keypressed');
     const keyPressed = e.which;
     const $topArrow = $('.arrow').first();
-    if($topArrow.data('active') && arrowsInActiveArea.length > 0 && $topArrow.data('direction') === keyCodes[keyPressed]){
+    if($topArrow.hasClass('active') && arrowsInActiveArea.length > 0 && $topArrow.data('direction') === keyCodes[keyPressed]){
       score++;
       console.log(score);
       deActivate($topArrow);

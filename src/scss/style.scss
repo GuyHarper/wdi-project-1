@@ -28,6 +28,16 @@ div {
     height: $game-height / 4;
     top: 0;
   }
+  &.health-bar-container {
+    border: 1px solid #000;
+    width: $game-width * 0.6;
+    height: 10px;
+  }
+  &.health-bar {
+    background-color: #000;
+    width: $game-width * 0.6;
+    height: 10px;
+  }
   &.arrow {
     position: absolute;
     width: $arrow-width;
@@ -50,6 +60,9 @@ div {
     &.right {
       background-image: url('../images/right-arrow-icon-black.png');
       left: calc((#{$game-width} * 7/10 * 7/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
+    }
+    &.hit {
+      display: none;
     }
   }
 }
