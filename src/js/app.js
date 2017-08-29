@@ -71,14 +71,20 @@ $(() => {
     const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
       moveArrow($newArrow);
-      if($activeArea.position().top <= $newArrow.position().top && $newArrow.position().top <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false) {
+      if($activeArea.position().top <= $newArrow.position().top && ($newArrow.position().top + $newArrow.height()) <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false && !$newArrow.hasClass('hit')) {
         activate($newArrow);
       }
       if($activeArea.position().top >= $newArrow.position().top && $newArrow.hasClass('active') === true) {
         deActivate($newArrow);
       }
-      if($newArrow.position().top <= 0) {
+      if($newArrow.hasClass('hit') === false && $newArrow.position().top <= 0) {
         arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
+        health -= 10;
+        $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+        deleteArrow($newArrow);
+        clearInterval(timerId);
+      }
+      if($newArrow.hasClass('hit') && $newArrow.position().top <= 0) {
         deleteArrow($newArrow);
         clearInterval(timerId);
       }
@@ -98,6 +104,7 @@ $(() => {
   function activate($arrow) {
     arrowsInActiveArea.push({id: $arrow.data('id'), direction: $arrow.data('direction')});
     $arrow.addClass('active');
+    console.log(arrowsInActiveArea);
   }
 
   function deActivate($arrow) {
@@ -111,12 +118,13 @@ $(() => {
   $(window).on('keydown', (e) => {
     console.log('keypressed');
     const keyPressed = e.which;
-    const $topArrow = $('.arrow').first();
-    if($topArrow.hasClass('active') && arrowsInActiveArea.length > 0 && $topArrow.data('direction') === keyCodes[keyPressed]){
+    const $topArrow = $('.arrow').filter('.active');
+    console.log($topArrow);
+    if(arrowsInActiveArea.length > 0 && $topArrow.data('direction') === keyCodes[keyPressed]){
       score++;
       console.log(score);
+      $topArrow.addClass('hit');
       deActivate($topArrow);
-      deleteArrow($topArrow);
     }
   });
 });
