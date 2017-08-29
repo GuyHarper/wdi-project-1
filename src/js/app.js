@@ -3,7 +3,9 @@ $(() => {
   const $gameArea = $('.game-area');
   const $button = $('button');
   const $activeArea = $('.active-area');
-  const beatsPerMinute = 116;
+  const audio = document.querySelector('audio');
+  const beatsPerMinute = 116.8;
+  const startDelay = 0; // Number of milliseconds until first beat in audio file
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let arrowId = 0;
   const arrowsOnScreen = [];
@@ -21,13 +23,19 @@ $(() => {
   $button.on('click', () => {
     if(run === false) {
       score = 0;
+      arrowProcess();
       runTimerId = setInterval(function() {
         arrowProcess();
       }, 1000 * 60/beatsPerMinute);
       run = true;
+      setTimeout(function() {
+        audio.play();
+      }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
     } else {
       clearInterval(runTimerId);
       run = false;
+      audio.pause();
+      audio.currentTime = 0;
     }
   });
 
