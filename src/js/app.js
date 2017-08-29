@@ -1,7 +1,8 @@
 $(() => {
 
   const $gameArea = $('.game-area');
-  const $button = $('button');
+  const $startButton = $('button.start');
+  const $quitButton = $('button.quit');
   const $activeArea = $('.active-area');
   const $healthBar = $('.health-bar');
   let health = 100;
@@ -25,28 +26,20 @@ $(() => {
     40: 'down'
   };
 
-  $button.on('click', () => {
-    if(run === false) {
-      $('.arrow').remove();
-      score = 0;
-      health = 100;
-      $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+  $startButton.on('click', () => {
+    $startButton.addClass('hidden');
+    $quitButton.removeClass('hidden');
+    score = 0;
+    health = 100;
+    $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+    arrowProcess();
+    runTimerId = setInterval(function() {
       arrowProcess();
-      runTimerId = setInterval(function() {
-        arrowProcess();
-      }, 1000 * 60/beatsPerMinute);
-      run = true;
-      startSongTimerId = setTimeout(function() {
-        song.play();
-      }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
-    } else {
-      clearInterval(runTimerId);
-      clearTimeout(startSongTimerId);
-      run = false;
-      song.pause();
-      song.currentTime = 0;
-      recordScratch.play();
-    }
+    }, 1000 * 60/beatsPerMinute);
+    run = true;
+    startSongTimerId = setTimeout(function() {
+      song.play();
+    }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
     setTimeout(function() {
       clearInterval(runTimerId);
       run = false;
@@ -55,6 +48,18 @@ $(() => {
       song.pause();
       song.currentTime = 0;
     }, lengthOfSong + startDelay + endDelay);
+  });
+
+  $quitButton.on('click', () => {
+    $quitButton.addClass('hidden');
+    $startButton.removeClass('hidden');
+    $('.arrow').remove();
+    clearInterval(runTimerId);
+    clearTimeout(startSongTimerId);
+    run = false;
+    song.pause();
+    song.currentTime = 0;
+    recordScratch.play();
   });
 
   function createArrow(direction) {
