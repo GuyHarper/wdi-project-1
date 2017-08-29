@@ -21,8 +21,10 @@ $(() => {
   let run = false;
   let runTimerId = null;
   let startSongTimerId = null;
+  let arrowProcessTimerId = null;
   let stopCreatingArrowsAtEndTimerId = null;
   let stopSongAtEndTimerId = null;
+  let arrowMoveTimerId = null;
   let score = null;
   const keyCodes = {
     37: 'left',
@@ -34,15 +36,24 @@ $(() => {
   $startButton.on('click', () => {
     $startButton.addClass('hidden');
     $quitButton.removeClass('hidden');
+    $quitButton.text('Quit & return to menu');
     $healthBarContainer.removeClass('hidden');
     score = 0;
     health = 100;
     $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
     countDown();
-    arrowProcess();
+    createArrow();
     runTimerId = setInterval(function() {
-      arrowProcess();
+      createArrow();
     }, 1000 * 60/beatsPerMinute);
+    arrowMoveTimerId = setInterval(function() {
+      moveArrows();
+    }, 10);
+    setTimeout(function() {
+      arrowProcessTimerId = setInterval(function() {
+        arrowProcess();
+      }, 1000 * 60/beatsPerMinute);
+    }, 10);
     run = true;
     startSongTimerId = setTimeout(function() {
       song.play();
@@ -78,6 +89,8 @@ $(() => {
     $healthBarContainer.addClass('hidden');
     $('.arrow').remove();
     clearInterval(runTimerId);
+    clearInterval(arrowMoveTimerId);
+    clearInterval(arrowProcessTimerId);
     clearTimeout(startSongTimerId);
     clearTimeout(stopCreatingArrowsAtEndTimerId);
     clearTimeout(stopSongAtEndTimerId);
@@ -85,9 +98,12 @@ $(() => {
     song.pause();
     song.currentTime = 0;
     recordScratch.play();
+    $messageArea.text('');
   });
 
-  function createArrow(direction) {
+  function createArrow() {
+    const directions = ['left','up','right','down'];
+    const direction = directions[Math.floor(Math.random()*4)];
     const $newArrow = $('<div class="arrow"></div>');
     arrowId++;
     $newArrow.data({id: arrowId, direction: direction});
@@ -100,59 +116,59 @@ $(() => {
     return $newArrow;
   }
 
-  function arrowProcess() {
-    const directions = ['left','up','right','down'];
-    const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
-    const timerId = setInterval(function() {
-      if(health <= 0 || run === false) {
-        clearInterval(timerId);
-      } else {
-        moveArrow($newArrow);
-        if($activeArea.position().top <= $newArrow.position().top && ($newArrow.position().top + $newArrow.height()/2) <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false && !$newArrow.hasClass('hit')) {
-          activate($newArrow);
-        }
-        if($newArrow.hasClass('hit') === false && $newArrow.position().top <= - $newArrow.height()/2) {
-          if ($newArrow.hasClass('active')) {
-            arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
-            health -= 10;
-            $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
-            cowbell.currentTime = 0;
-            cowbell.play();
-            deActivate($newArrow);
-          }
-          if($newArrow.position().top <= - $newArrow.height()) {
-            deleteArrow($newArrow);
-            clearInterval(timerId);
-          }
-          if(health <= 0) {
-            loseGame();
-          }
-        }
-        if($newArrow.hasClass('hit') && $newArrow.position().top <= 0) {
-          deleteArrow($newArrow);
-          clearInterval(timerId);
-        }
-      }
-    },10);
-  }
-
   function loseGame() {
     clearInterval(runTimerId);
+    clearInterval(arrowMoveTimerId);
+    clearInterval(arrowProcessTimerId);
     run = false;
     song.pause();
     song.currentTime = 0;
     recordScratch.play();
-    console.log('YOU LOSE');
+    $messageArea.text('YOU LOSE');
+    $quitButton.text('Play again');
   }
 
   function deleteArrow($arrow) {
     $arrow.remove();
   }
 
-  function moveArrow($arrow) {
-    const $arrowY = $arrow.position();
-    $arrow.css({top: $arrowY.top - ($gameArea.height() - ($activeArea.height() - $arrow.height()/2) - $arrow.height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
-    return $arrowY;
+  // function moveArrow($arrow) {
+  //   const $arrowY = $arrow.position();
+  //   $arrow.css({top: $arrowY.top - ($gameArea.height() - ($activeArea.height() - $arrow.height()/2) - $arrow.height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
+  //   return $arrowY;
+  // }
+
+  function moveArrows() {
+    $('.arrow').each((index, element) => {
+      $(element).css({top: $(element).position().top - ($gameArea.height() - ($activeArea.height() - $(element).height()/2) - $(element).height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
+    });
+  }
+
+  function arrowProcess() {
+    $('.arrow').each((index, element) => {
+      if($activeArea.position().top <= $(element).position().top && ($(element).position().top + $(element).height()/2) <= ($activeArea.position().top + $activeArea.height()) && $(element).hasClass('active') === false && !$(element).hasClass('hit')) {
+        activate($(element));
+      }
+      if($(element).hasClass('hit') === false && $(element).position().top <= - $(element).height()/2) {
+        if ($(element).hasClass('active')) {
+          arrowsOnScreen.splice(arrowsOnScreen.indexOf($(element).data('id')), 1);
+          health -= 10;
+          $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+          cowbell.currentTime = 0;
+          cowbell.play();
+          deActivate($(element));
+        }
+        if($(element).position().top <= - $(element).height()) {
+          deleteArrow($(element));
+        }
+        if(health <= 0) {
+          loseGame();
+        }
+      }
+      if($(element).hasClass('hit') && $(element).position().top <= 0) {
+        deleteArrow($(element));
+      }
+    });
   }
 
   function activate($arrow) {
