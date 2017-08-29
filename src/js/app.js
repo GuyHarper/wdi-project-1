@@ -5,7 +5,8 @@ $(() => {
   const $activeArea = $('.active-area');
   const $healthBar = $('.health-bar');
   let health = 100;
-  const audio = document.querySelector('audio');
+  const song = document.querySelector('.song');
+  const recordScratch = document.querySelector('.record-scratch');
   const beatsPerMinute = 116.8;
   const lengthOfSong = 426000; // Length of active part of song in milliseconds (from first beat to last beat you want to be displayed)
   const endDelay = 7000; // Number of milliseconds to continue playing after last beat displayed
@@ -26,6 +27,7 @@ $(() => {
 
   $button.on('click', () => {
     if(run === false) {
+      $('.arrow').remove();
       score = 0;
       health = 100;
       $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
@@ -35,21 +37,21 @@ $(() => {
       }, 1000 * 60/beatsPerMinute);
       run = true;
       setTimeout(function() {
-        audio.play();
+        song.play();
       }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
     } else {
       clearInterval(runTimerId);
       run = false;
-      audio.pause();
-      audio.currentTime = 0;
+      song.pause();
+      song.currentTime = 0;
     }
     setTimeout(function() {
       clearInterval(runTimerId);
       run = false;
     }, lengthOfSong + startDelay);
     setTimeout(function() {
-      audio.pause();
-      audio.currentTime = 0;
+      song.pause();
+      song.currentTime = 0;
     }, lengthOfSong + startDelay + endDelay);
   });
 
@@ -70,25 +72,41 @@ $(() => {
     const directions = ['left','up','right','down'];
     const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
-      moveArrow($newArrow);
-      if($activeArea.position().top <= $newArrow.position().top && ($newArrow.position().top + $newArrow.height()) <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false && !$newArrow.hasClass('hit')) {
-        activate($newArrow);
-      }
-      if($activeArea.position().top >= $newArrow.position().top && $newArrow.hasClass('active') === true) {
-        deActivate($newArrow);
-      }
-      if($newArrow.hasClass('hit') === false && $newArrow.position().top <= 0) {
-        arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
-        health -= 10;
-        $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
-        deleteArrow($newArrow);
+      if(health <= 0) {
         clearInterval(timerId);
-      }
-      if($newArrow.hasClass('hit') && $newArrow.position().top <= 0) {
-        deleteArrow($newArrow);
-        clearInterval(timerId);
+      } else {
+        moveArrow($newArrow);
+        if($activeArea.position().top <= $newArrow.position().top && ($newArrow.position().top + $newArrow.height()/2) <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false && !$newArrow.hasClass('hit')) {
+          activate($newArrow);
+        }
+        if($activeArea.position().top >= $newArrow.position().top && $newArrow.hasClass('active') === true) {
+          deActivate($newArrow);
+        }
+        if($newArrow.hasClass('hit') === false && $newArrow.position().top <= 0) {
+          arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
+          health -= 10;
+          $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+          deleteArrow($newArrow);
+          clearInterval(timerId);
+          if(health <= 0) {
+            loseGame();
+          }
+        }
+        if($newArrow.hasClass('hit') && $newArrow.position().top <= 0) {
+          deleteArrow($newArrow);
+          clearInterval(timerId);
+        }
       }
     },10);
+  }
+
+  function loseGame() {
+    clearInterval(runTimerId);
+    run = false;
+    song.pause();
+    song.currentTime = 0;
+    recordScratch.play();
+    console.log('YOU LOSE');
   }
 
   function deleteArrow($arrow) {
