@@ -18,6 +18,8 @@ $(() => {
   let run = false;
   let runTimerId = null;
   let startSongTimerId = null;
+  let stopCreatingArrowsAtEndTimerId = null;
+  let stopSongAtEndTimerId = null;
   let score = null;
   const keyCodes = {
     37: 'left',
@@ -40,11 +42,11 @@ $(() => {
     startSongTimerId = setTimeout(function() {
       song.play();
     }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
-    setTimeout(function() {
+    stopCreatingArrowsAtEndTimerId = setTimeout(function() {
       clearInterval(runTimerId);
       run = false;
     }, lengthOfSong + startDelay);
-    setTimeout(function() {
+    stopSongAtEndTimerId = setTimeout(function() {
       song.pause();
       song.currentTime = 0;
     }, lengthOfSong + startDelay + endDelay);
@@ -56,6 +58,8 @@ $(() => {
     $('.arrow').remove();
     clearInterval(runTimerId);
     clearTimeout(startSongTimerId);
+    clearTimeout(stopCreatingArrowsAtEndTimerId);
+    clearTimeout(stopSongAtEndTimerId);
     run = false;
     song.pause();
     song.currentTime = 0;
