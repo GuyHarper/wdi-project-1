@@ -17,6 +17,9 @@ main {
 div {
   &.game-area {
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: $game-width;
     height: $game-height;
     border: 2px solid #000;
@@ -25,7 +28,7 @@ div {
     position: absolute;
     background-color: #999;
     width: $game-width;
-    height: $game-height / 4;
+    height: $game-height / 6;
     top: 0;
   }
   &.health-bar-container {
@@ -37,6 +40,9 @@ div {
     background-color: #000;
     width: $game-width * 0.6;
     height: 10px;
+  }
+  &.hidden {
+    display: none;
   }
   &.arrow {
     position: absolute;
