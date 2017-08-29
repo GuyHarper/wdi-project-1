@@ -11,6 +11,7 @@ $(() => {
   const song = document.querySelector('.song');
   const recordScratch = document.querySelector('.record-scratch');
   const cowbell = document.querySelector('.cowbell');
+  const countSound = document.querySelector('.count-sound');
   const beatsPerMinute = 116.8;
   const lengthOfSong = 426000; // Length of active part of song in milliseconds (from first beat to last beat you want to be displayed)
   const endDelay = 7000; // Number of milliseconds to continue playing after last beat displayed
@@ -34,52 +35,58 @@ $(() => {
   };
 
   $startButton.on('click', () => {
-    $startButton.addClass('hidden');
-    $quitButton.removeClass('hidden');
-    $quitButton.text('Quit & return to menu');
-    $healthBarContainer.removeClass('hidden');
-    score = 0;
-    health = 100;
-    $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
-    countDown();
-    createArrow();
-    runTimerId = setInterval(function() {
-      createArrow();
-    }, 1000 * 60/beatsPerMinute);
-    arrowMoveTimerId = setInterval(function() {
-      moveArrows();
-    }, 10);
     setTimeout(function() {
-      arrowProcessTimerId = setInterval(function() {
-        arrowProcess();
+      countSound.play();
+      countDown();
+    }, 240); // This corrects the delay in the countdown audio file
+    setTimeout(function() {
+      $startButton.addClass('hidden');
+      $quitButton.removeClass('hidden');
+      $quitButton.text('Quit & return to menu');
+      $healthBarContainer.removeClass('hidden');
+      score = 0;
+      health = 100;
+      $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+      createArrow();
+      runTimerId = setInterval(function() {
+        createArrow();
       }, 1000 * 60/beatsPerMinute);
-    }, 10);
-    run = true;
-    startSongTimerId = setTimeout(function() {
-      song.play();
-    }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
-    stopCreatingArrowsAtEndTimerId = setTimeout(function() {
-      clearInterval(runTimerId);
-      run = false;
-    }, lengthOfSong + startDelay);
-    stopSongAtEndTimerId = setTimeout(function() {
-      song.pause();
-      song.currentTime = 0;
-    }, lengthOfSong + startDelay + endDelay);
+      arrowMoveTimerId = setInterval(function() {
+        moveArrows();
+      }, 10);
+      setTimeout(function() {
+        arrowProcessTimerId = setInterval(function() {
+          arrowProcess();
+        }, 1000 * 60/beatsPerMinute);
+      }, 10);
+      run = true;
+      startSongTimerId = setTimeout(function() {
+        song.play();
+      }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
+      stopCreatingArrowsAtEndTimerId = setTimeout(function() {
+        clearInterval(runTimerId);
+        run = false;
+      }, lengthOfSong + startDelay);
+      stopSongAtEndTimerId = setTimeout(function() {
+        song.pause();
+        song.currentTime = 0;
+      }, lengthOfSong + startDelay + endDelay);
+    }, 100);
   });
 
   function countDown() {
-    let count = 4;
+    let count = 3;
     const runCountDownId = setInterval(function() {
-      count--;
       if(count > 0 ) {
         $messageArea.text(count);
+        countSound.play();
       } else if(count === 0) {
         $messageArea.text('GO');
       } else {
         $messageArea.text('');
         clearInterval(runCountDownId);
       }
+      count--;
     }, 1000 * 60/beatsPerMinute);
   }
 
