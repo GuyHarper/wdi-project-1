@@ -93,15 +93,20 @@ $(() => {
         if($activeArea.position().top <= $newArrow.position().top && ($newArrow.position().top + $newArrow.height()/2) <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false && !$newArrow.hasClass('hit')) {
           activate($newArrow);
         }
-        if($activeArea.position().top >= $newArrow.position().top && $newArrow.hasClass('active') === true) {
-          deActivate($newArrow);
-        }
-        if($newArrow.hasClass('hit') === false && $newArrow.position().top <= 0) {
-          arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
-          health -= 10;
-          $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
-          deleteArrow($newArrow);
-          clearInterval(timerId);
+        // if($activeArea.position().top >= $newArrow.position().top && $newArrow.hasClass('active')) {
+        //   deActivate($newArrow);
+        // }
+        if($newArrow.hasClass('hit') === false && $newArrow.position().top <= - $newArrow.height()/2) {
+          if ($newArrow.hasClass('active')) {
+            arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
+            health -= 10;
+            $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+            deActivate($newArrow);
+          }
+          if($newArrow.position().top <= - $newArrow.height()) {
+            deleteArrow($newArrow);
+            clearInterval(timerId);
+          }
           if(health <= 0) {
             loseGame();
           }

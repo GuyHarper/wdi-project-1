@@ -23,6 +23,7 @@ div {
     width: $game-width;
     height: $game-height;
     border: 2px solid #000;
+    overflow: hidden;
   }
   &.active-area {
     position: absolute;
