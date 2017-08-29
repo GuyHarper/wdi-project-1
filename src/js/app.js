@@ -4,6 +4,7 @@ $(() => {
   const $startButton = $('button.start');
   const $quitButton = $('button.quit');
   const $activeArea = $('.active-area');
+  const $healthBarContainer = $('.health-bar-container');
   const $healthBar = $('.health-bar');
   let health = 100;
   const song = document.querySelector('.song');
@@ -31,6 +32,7 @@ $(() => {
   $startButton.on('click', () => {
     $startButton.addClass('hidden');
     $quitButton.removeClass('hidden');
+    $healthBarContainer.removeClass('hidden');
     score = 0;
     health = 100;
     $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
@@ -55,6 +57,7 @@ $(() => {
   $quitButton.on('click', () => {
     $quitButton.addClass('hidden');
     $startButton.removeClass('hidden');
+    $healthBarContainer.addClass('hidden');
     $('.arrow').remove();
     clearInterval(runTimerId);
     clearTimeout(startSongTimerId);
