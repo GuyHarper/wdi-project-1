@@ -5,6 +5,8 @@ $(() => {
   const $activeArea = $('.active-area');
   const audio = document.querySelector('audio');
   const beatsPerMinute = 116.8;
+  const lengthOfSong = 426000; // Length of active part of song in milliseconds (from first beat to last beat you want to be displayed)
+  const endDelay = 7000; // Number of milliseconds to continue playing after last beat displayed
   const startDelay = 0; // Number of milliseconds until first beat in audio file
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let arrowId = 0;
@@ -37,6 +39,14 @@ $(() => {
       audio.pause();
       audio.currentTime = 0;
     }
+    setTimeout(function() {
+      clearInterval(runTimerId);
+      run = false;
+    }, lengthOfSong + startDelay);
+    setTimeout(function() {
+      audio.pause();
+      audio.currentTime = 0;
+    }, lengthOfSong + startDelay + endDelay);
   });
 
   function createArrow(direction) {
