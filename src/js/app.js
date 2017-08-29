@@ -9,6 +9,7 @@ $(() => {
   let health = 100;
   const song = document.querySelector('.song');
   const recordScratch = document.querySelector('.record-scratch');
+  const cowbell = document.querySelector('.cowbell');
   const beatsPerMinute = 116.8;
   const lengthOfSong = 426000; // Length of active part of song in milliseconds (from first beat to last beat you want to be displayed)
   const endDelay = 7000; // Number of milliseconds to continue playing after last beat displayed
@@ -93,14 +94,13 @@ $(() => {
         if($activeArea.position().top <= $newArrow.position().top && ($newArrow.position().top + $newArrow.height()/2) <= ($activeArea.position().top + $activeArea.height()) && $newArrow.hasClass('active') === false && !$newArrow.hasClass('hit')) {
           activate($newArrow);
         }
-        // if($activeArea.position().top >= $newArrow.position().top && $newArrow.hasClass('active')) {
-        //   deActivate($newArrow);
-        // }
         if($newArrow.hasClass('hit') === false && $newArrow.position().top <= - $newArrow.height()/2) {
           if ($newArrow.hasClass('active')) {
             arrowsOnScreen.splice(arrowsOnScreen.indexOf($newArrow.data('id')), 1);
             health -= 10;
             $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+            cowbell.currentTime = 0;
+            cowbell.play();
             deActivate($newArrow);
           }
           if($newArrow.position().top <= - $newArrow.height()) {
