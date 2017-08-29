@@ -6,6 +6,7 @@ $(() => {
   const $activeArea = $('.active-area');
   const $healthBarContainer = $('.health-bar-container');
   const $healthBar = $('.health-bar');
+  const $messageArea = $('.message-area');
   let health = 100;
   const song = document.querySelector('.song');
   const recordScratch = document.querySelector('.record-scratch');
@@ -37,6 +38,7 @@ $(() => {
     score = 0;
     health = 100;
     $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
+    countDown();
     arrowProcess();
     runTimerId = setInterval(function() {
       arrowProcess();
@@ -54,6 +56,21 @@ $(() => {
       song.currentTime = 0;
     }, lengthOfSong + startDelay + endDelay);
   });
+
+  function countDown() {
+    let count = 4;
+    const runCountDownId = setInterval(function() {
+      count--;
+      if(count > 0 ) {
+        $messageArea.text(count);
+      } else if(count === 0) {
+        $messageArea.text('GO');
+      } else {
+        $messageArea.text('');
+        clearInterval(runCountDownId);
+      }
+    }, 1000 * 60/beatsPerMinute);
+  }
 
   $quitButton.on('click', () => {
     $quitButton.addClass('hidden');
