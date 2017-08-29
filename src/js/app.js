@@ -14,9 +14,9 @@ $(() => {
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let arrowId = 0;
   const arrowsOnScreen = [];
-  const arrowsInActiveArea = [];
   let run = false;
   let runTimerId = null;
+  let startSongTimerId = null;
   let score = null;
   const keyCodes = {
     37: 'left',
@@ -36,14 +36,16 @@ $(() => {
         arrowProcess();
       }, 1000 * 60/beatsPerMinute);
       run = true;
-      setTimeout(function() {
+      startSongTimerId = setTimeout(function() {
         song.play();
       }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
     } else {
       clearInterval(runTimerId);
+      clearTimeout(startSongTimerId);
       run = false;
       song.pause();
       song.currentTime = 0;
+      recordScratch.play();
     }
     setTimeout(function() {
       clearInterval(runTimerId);
@@ -72,7 +74,7 @@ $(() => {
     const directions = ['left','up','right','down'];
     const $newArrow = createArrow(directions[Math.floor(Math.random()*4)]);
     const timerId = setInterval(function() {
-      if(health <= 0) {
+      if(health <= 0 || run === false) {
         clearInterval(timerId);
       } else {
         moveArrow($newArrow);
@@ -120,29 +122,23 @@ $(() => {
   }
 
   function activate($arrow) {
-    arrowsInActiveArea.push({id: $arrow.data('id'), direction: $arrow.data('direction')});
     $arrow.addClass('active');
-    console.log(arrowsInActiveArea);
   }
 
   function deActivate($arrow) {
-    const index = arrowsInActiveArea.map((e) => {
-      return e.id;
-    }).indexOf($arrow.data('id'));
-    arrowsInActiveArea.splice(index, 1);
     $arrow.removeClass('active');
   }
 
   $(window).on('keydown', (e) => {
     console.log('keypressed');
     const keyPressed = e.which;
-    const $topArrow = $('.arrow').filter('.active');
-    console.log($topArrow);
-    if(arrowsInActiveArea.length > 0 && $topArrow.data('direction') === keyCodes[keyPressed]){
+    const $activeArrow = $('.arrow').filter('.active');
+    console.log($activeArrow);
+    if($activeArrow.data('direction') === keyCodes[keyPressed]){
       score++;
       console.log(score);
-      $topArrow.addClass('hit');
-      deActivate($topArrow);
+      $activeArrow.addClass('hit');
+      deActivate($activeArrow);
     }
   });
 });
