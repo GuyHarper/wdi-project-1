@@ -12,7 +12,7 @@ $(() => {
   const recordScratch = document.querySelector('.record-scratch');
   const cowbell = document.querySelector('.cowbell');
   const countSound = document.querySelector('.count-sound');
-  const beatsPerMinute = 116.8;
+  const beatsPerMinute = 117;
   const lengthOfSong = 426000; // Length of active part of song in milliseconds (from first beat to last beat you want to be displayed)
   const endDelay = 7000; // Number of milliseconds to continue playing after last beat displayed
   const startDelay = 0; // Number of milliseconds until first beat in audio file
@@ -33,6 +33,63 @@ $(() => {
     39: 'right',
     40: 'down'
   };
+  const songPattern = [
+    {type: [1,0,0,0,2,0,0,0], bars: 2},
+    {type: [3,0,0,0,4,0,0,0], bars: 2},
+    {type: [3,0,4,0,3,0,4,0], bars: 2},
+    {type: [3,0,1,0,3,0,1,0], bars: 2},
+    {type: [1,0,2,0,3,0,4,0], bars: 4},
+    {type: [3,0,1,0,4,0,1,0], bars: 4},
+    {type: [1,0,[1,2],0,3,0,4,0], bars: 4},
+    {type: [3,0,[3,4],0,3,0,1,0], bars: 4},
+    {type: [1,2,1,0,[1,3],0,1,0], bars: 4},
+    {type: [[3,4],0,[3,4],0,3,1,4,0], bars: 4}
+  ];
+
+  function runSong(pattern) {
+    const wholeSongPattern = [];
+    pattern.forEach((e) => {
+      const numberBars = e.bars;
+      const barPattern = e.type;
+      for(let i = numberBars; i > 0; i--) {
+        barPattern.forEach((e2) => {
+          wholeSongPattern.push(e2);
+        });
+      }
+    });
+    let currentBeat = 0;
+    if(wholeSongPattern[currentBeat] > 0) {
+      createArrow(wholeSongPattern[currentBeat]);
+    } else if (wholeSongPattern[currentBeat].length === 2) {
+      createArrow(wholeSongPattern[currentBeat][0]);
+      createArrow(wholeSongPattern[currentBeat][1]);
+    }
+    currentBeat++;
+    runTimerId = setInterval(function() {
+      if(wholeSongPattern[currentBeat] > 0) {
+        createArrow(wholeSongPattern[currentBeat]);
+      } else if (wholeSongPattern[currentBeat].length === 2) {
+        createArrow(wholeSongPattern[currentBeat][0]);
+        createArrow(wholeSongPattern[currentBeat][1]);
+      }
+      currentBeat++;
+    }, 1000 * 60/beatsPerMinute / 2);
+  }
+
+  function createArrow(type) {
+    const directions = ['left','up','right','down'];
+    const direction = directions[type - 1];
+    const $newArrow = $('<div class="arrow"></div>');
+    arrowId++;
+    $newArrow.data({id: arrowId, direction: direction});
+    arrowsOnScreen.push(arrowId);
+    $gameArea.append($newArrow);
+    $newArrow.addClass(direction);
+    const gameHeight = $gameArea.height();
+    const arrowHeight = $newArrow.height();
+    $newArrow.css({top: gameHeight-arrowHeight});
+    return $newArrow;
+  }
 
   $startButton.on('click', () => {
     setTimeout(function() {
@@ -47,17 +104,14 @@ $(() => {
       score = 0;
       health = 100;
       $healthBar.width(`${health/100 * $gameArea.width() * 0.6}px`);
-      createArrow();
-      runTimerId = setInterval(function() {
-        createArrow();
-      }, 1000 * 60/beatsPerMinute);
+      runSong(songPattern);
       arrowMoveTimerId = setInterval(function() {
         moveArrows();
       }, 10);
       setTimeout(function() {
         arrowProcessTimerId = setInterval(function() {
           arrowProcess();
-        }, 1000 * 60/beatsPerMinute);
+        }, 1000 * 60/beatsPerMinute / 2);
       }, 10);
       run = true;
       startSongTimerId = setTimeout(function() {
@@ -107,21 +161,6 @@ $(() => {
     recordScratch.play();
     $messageArea.text('');
   });
-
-  function createArrow() {
-    const directions = ['left','up','right','down'];
-    const direction = directions[Math.floor(Math.random()*4)];
-    const $newArrow = $('<div class="arrow"></div>');
-    arrowId++;
-    $newArrow.data({id: arrowId, direction: direction});
-    arrowsOnScreen.push(arrowId);
-    $gameArea.append($newArrow);
-    $newArrow.addClass(direction);
-    const gameHeight = $gameArea.height();
-    const arrowHeight = $newArrow.height();
-    $newArrow.css({top: gameHeight-arrowHeight});
-    return $newArrow;
-  }
 
   function loseGame() {
     clearInterval(runTimerId);
@@ -187,13 +226,10 @@ $(() => {
   }
 
   $(window).on('keydown', (e) => {
-    console.log('keypressed');
     const keyPressed = e.which;
     const $activeArrow = $('.arrow').filter('.active');
-    console.log($activeArrow);
     if($activeArrow.data('direction') === keyCodes[keyPressed]){
-      score++;
-      console.log(score);
+      // score++;
       $activeArrow.addClass('hit');
       deActivate($activeArrow);
     }
