@@ -18,7 +18,7 @@ $(() => {
   const recordScratch = document.querySelector('.record-scratch');
   const cowbell = document.querySelector('.cowbell');
   const countSound = document.querySelector('.count-sound');
-  const beatsPerMinute = 117;
+  const beatsPerMinute = 116.73151750; // 51 is too fast;
   const startDelay = 0; // Number of milliseconds until first beat in audio file
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let run = false;
@@ -42,6 +42,7 @@ $(() => {
     83: 'down'
   };
   const songPattern = [
+    {type: [2,0,2,0,2,0,2,0], bars: 100},
     {type: [1,0,0,0,2,0,0,0], bars: 2},
     {type: [3,0,0,0,4,0,0,0], bars: 2},
     {type: [3,0,4,0,3,0,4,0], bars: 2},
@@ -320,10 +321,18 @@ $(() => {
       const $activeArrow2 = $('.arrow').filter('.player-two').filter('.active');
       if($activeArrow1.hasClass(keyCodes2[keyPressed])) {
         // player1Score++;
+        $messageAreaPlayer1.text('');
+        if($activeArrow1.position().top >= $activeArea.position().top - $activeArea.height() + $activeArrow1.height() - 4 && $activeArrow1.position().top <= $activeArea.position().top - $activeArea.height() + $activeArrow1.height() + 4) {
+          $messageAreaPlayer1.text('Perfect');
+        }
         deActivate($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
         deleteArrow($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
       } else if($activeArrow2.hasClass(keyCodes1[keyPressed])) {
         // player2Score++;
+        $messageAreaPlayer2.text('');
+        if($activeArrow2.position().top >= $activeArea.position().top - $activeArea.height() + $activeArrow2.height() - 4 && $activeArrow2.position().top <= $activeArea.position().top - $activeArea.height() + $activeArrow2.height() + 4) {
+          $messageAreaPlayer2.text('Perfect');
+        }
         deActivate($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
         deleteArrow($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
       } else if (keyCodes2[keyPressed] !== -1){
@@ -343,6 +352,10 @@ $(() => {
       const $activeArrow = $('.arrow').filter('.active');
       if($activeArrow.hasClass(keyCodes1[keyPressed])) {
         // player1Score++;
+        $messageAreaPlayer1.text('');
+        if($activeArrow.position().top >= $activeArea.position().top - $activeArea.height() + $activeArrow.height() - 4 && $activeArrow.position().top <= $activeArea.position().top - $activeArea.height() + $activeArrow.height() + 4) {
+          $messageAreaPlayer1.text('Perfect');
+        }
         deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
         deleteArrow($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
       } else if (keyCodes2[keyPressed] !== -1){
