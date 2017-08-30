@@ -173,6 +173,7 @@ $(() => {
       $gameAreaPlayer2.addClass('hidden');
       player1Score = 0;
       player1Health = 100;
+      player2Health = 100;
       $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
       runSong(songPattern);
       arrowMoveTimerId = setInterval(function() {
