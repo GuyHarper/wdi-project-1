@@ -89,7 +89,7 @@ $(() => {
         arrowProcessTimerId = setInterval(function() {
           arrowProcess();
         }, 1000 * 60/beatsPerMinute / 2);
-      }, 10);
+      }, 50);
       run = true;
       startSongTimerId = setTimeout(function() {
         song.play();
@@ -145,7 +145,7 @@ $(() => {
     } else {
       const directions = ['left','up','right','down'];
       const direction = directions[type - 1];
-      const $newArrow = $('<div class="arrow"></div>');
+      const $newArrow = $('<div class="arrow player-one"></div>');
       $newArrow.addClass(direction);
       $gameAreaPlayer1.append($newArrow);
       $newArrow.addClass(direction);
@@ -182,7 +182,7 @@ $(() => {
         arrowProcessTimerId = setInterval(function() {
           arrowProcess();
         }, 1000 * 60/beatsPerMinute / 2);
-      }, 5);
+      }, 50);
       run = true;
       startSongTimerId = setTimeout(function() {
         song.play();
@@ -281,6 +281,7 @@ $(() => {
 
   function arrowProcess() {
     $('.arrow').each((index, element) => {
+      console.log(player1Health);
       if($activeArea.position().top <= $(element).position().top && ($(element).position().top + $(element).height()/2) <= ($activeArea.position().top + $activeArea.height()) && $(element).hasClass('active') === false) {
         activate($(element));
       }
@@ -334,7 +335,7 @@ $(() => {
       }
     } else {
       const $activeArrow = $('.arrow').filter('.active');
-      console.log(`${keyCodes1[keyPressed]}`,$activeArrow.filter(`.${keyCodes1[keyPressed]}`));
+      // console.log(`${keyCodes1[keyPressed]}`,$activeArrow.filter(`.${keyCodes1[keyPressed]}`));
       if($activeArrow.hasClass(keyCodes1[keyPressed])) {
         // player1Score++;
         deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
