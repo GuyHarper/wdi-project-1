@@ -42,6 +42,7 @@ $(() => {
     83: 'down'
   };
   const songPattern = [
+    {type: [1,2,1,[2,3],1,0,1,0], bars: 4},
     {type: [1,0,0,0,2,0,0,0], bars: 2},
     {type: [3,0,0,0,4,0,0,0], bars: 2},
     {type: [3,0,4,0,3,0,4,0], bars: 2},
@@ -50,7 +51,7 @@ $(() => {
     {type: [3,0,1,0,4,0,1,0], bars: 4},
     {type: [1,0,[1,2],0,3,0,4,0], bars: 4},
     {type: [3,0,[3,4],0,3,0,1,0], bars: 4},
-    {type: [1,2,1,0,[1,3],0,1,0], bars: 4},
+    {type: [1,2,1,[2,3],1,0,1,0], bars: 4},
     {type: [[3,4],0,[3,4],0,3,1,4,0], bars: 4}
   ];
 
@@ -168,6 +169,8 @@ $(() => {
       $quitButton.removeClass('hidden');
       $quitButton.text('Quit & return to menu');
       $player1HealthBarContainer.removeClass('hidden');
+      $player2HealthBarContainer.addClass('hidden');
+      $gameAreaPlayer2.addClass('hidden');
       player1Score = 0;
       player1Health = 100;
       $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
@@ -278,7 +281,7 @@ $(() => {
 
   function arrowProcess() {
     $('.arrow').each((index, element) => {
-      if($activeArea.position().top <= $(element).position().top && ($(element).position().top + $(element).height()/2) <= ($activeArea.position().top + $activeArea.height()) && $(element).hasClass('active') === false && !$(element).hasClass('hit')) {
+      if($activeArea.position().top <= $(element).position().top && ($(element).position().top + $(element).height()/2) <= ($activeArea.position().top + $activeArea.height()) && $(element).hasClass('active') === false) {
         activate($(element));
       }
       if($(element).position().top <= - $(element).height()/4 && $(element).hasClass('active')) {
@@ -331,6 +334,7 @@ $(() => {
       }
     } else {
       const $activeArrow = $('.arrow').filter('.active');
+      console.log(`${keyCodes1[keyPressed]}`,$activeArrow.filter(`.${keyCodes1[keyPressed]}`));
       if($activeArrow.hasClass(keyCodes1[keyPressed])) {
         // player1Score++;
         deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
