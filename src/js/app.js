@@ -6,11 +6,11 @@ $(() => {
   const $startButtonTwoPlayer = $('button.start.two-player');
   const $quitButton = $('button.quit');
   const $activeArea = $('.active-area');
-  const $player1HealthBarContainer = $('.health-bar-container');
-  const $player1HealthBar = $('.health-bar');
+  const $player1HealthBarContainer = $('.health-bar-container.player-one');
+  const $player1HealthBar = $('.health-bar.player-one');
   const $player2HealthBarContainer = $('.health-bar-container.player-two');
   const $player2HealthBar = $('.health-bar.player-two');
-  const $messageAreaPlayer1 = $('.message-area');
+  const $messageAreaPlayer1 = $('.message-area.player-one');
   const $messageAreaPlayer2 = $('.message-area.player-two');
   let player1Health = 100;
   let player2Health = 100;
@@ -19,31 +19,29 @@ $(() => {
   const cowbell = document.querySelector('.cowbell');
   const countSound = document.querySelector('.count-sound');
   const beatsPerMinute = 117;
-  const lengthOfSong = 426000; // Length of active part of song in milliseconds (from first beat to last beat you want to be displayed)
-  const endDelay = 7000; // Number of milliseconds to continue playing after last beat displayed
   const startDelay = 0; // Number of milliseconds until first beat in audio file
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
-  let arrowId = 0;
-  const arrowsOnScreen = [];
   let run = false;
   let runTimerId = null;
   let startSongTimerId = null;
   let arrowProcessTimerId = null;
-  let stopCreatingArrowsAtEndTimerId = null;
-  let stopSongAtEndTimerId = null;
   let arrowMoveTimerId = null;
   let player1Score = null;
   let player2Score = null;
   let twoPlayerMode = false;
-  const keyCodes = {
+  const keyCodes1 = {
     37: 'left',
     38: 'up',
     39: 'right',
     40: 'down'
   };
+  const keyCodes2 = {
+    65: 'left',
+    87: 'up',
+    68: 'right',
+    83: 'down'
+  };
   const songPattern = [
-    {type: [1,2,1,2,[1,3],2,1,0], bars: 4},
-    {type: [[3,4],0,[3,4],0,3,1,4,0], bars: 4},
     {type: [1,0,0,0,2,0,0,0], bars: 2},
     {type: [3,0,0,0,4,0,0,0], bars: 2},
     {type: [3,0,4,0,3,0,4,0], bars: 2},
@@ -82,27 +80,19 @@ $(() => {
       player2Health = 100;
       $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
       $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
-      // runSong(songPattern);
-      // arrowMoveTimerId = setInterval(function() {
-      //   moveArrows();
-      // }, 10);
-      // setTimeout(function() {
-      //   arrowProcessTimerId = setInterval(function() {
-      //     arrowProcess();
-      //   }, 1000 * 60/beatsPerMinute / 2);
-      // }, 10);
-      // run = true;
-      // startSongTimerId = setTimeout(function() {
-      //   song.play();
-      // }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
-      // stopCreatingArrowsAtEndTimerId = setTimeout(function() {
-      //   clearInterval(runTimerId);
-      //   run = false;
-      // }, lengthOfSong + startDelay);
-      // stopSongAtEndTimerId = setTimeout(function() {
-      //   song.pause();
-      //   song.currentTime = 0;
-      // }, lengthOfSong + startDelay + endDelay);
+      runSong(songPattern);
+      arrowMoveTimerId = setInterval(function() {
+        moveArrows();
+      }, 10);
+      setTimeout(function() {
+        arrowProcessTimerId = setInterval(function() {
+          arrowProcess();
+        }, 1000 * 60/beatsPerMinute / 2);
+      }, 10);
+      run = true;
+      startSongTimerId = setTimeout(function() {
+        song.play();
+      }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
     }, 100);
   });
 
@@ -137,19 +127,31 @@ $(() => {
   }
 
   function createArrow(type) {
-    const directions = ['left','up','right','down'];
-    const direction = directions[type - 1];
-    const $newArrow = $('<div class="arrow"></div>');
-    arrowId++;
-    $newArrow.data({id: arrowId});
-    $newArrow.addClass(direction);
-    arrowsOnScreen.push(arrowId);
-    $gameAreaPlayer1.append($newArrow);
-    $newArrow.addClass(direction);
-    const gameHeight = $gameAreaPlayer1.height();
-    const arrowHeight = $newArrow.height();
-    $newArrow.css({top: gameHeight-arrowHeight});
-    return $newArrow;
+    if(twoPlayerMode) {
+      console.log(twoPlayerMode);
+      const directions = ['left','up','right','down'];
+      const direction = directions[type - 1];
+      const $newArrow1 = $('<div class="arrow player-one"></div>');
+      const $newArrow2 = $('<div class="arrow player-two"></div>');
+      $newArrow1.addClass(direction);
+      $newArrow2.addClass(direction);
+      $gameAreaPlayer1.append($newArrow1);
+      $gameAreaPlayer2.append($newArrow2);
+      const gameHeight = $gameAreaPlayer1.height();
+      const arrowHeight = $newArrow1.height();
+      $newArrow1.css({top: gameHeight-arrowHeight});
+      $newArrow2.css({top: gameHeight-arrowHeight});
+    } else {
+      const directions = ['left','up','right','down'];
+      const direction = directions[type - 1];
+      const $newArrow = $('<div class="arrow"></div>');
+      $newArrow.addClass(direction);
+      $gameAreaPlayer1.append($newArrow);
+      $newArrow.addClass(direction);
+      const gameHeight = $gameAreaPlayer1.height();
+      const arrowHeight = $newArrow.height();
+      $newArrow.css({top: gameHeight-arrowHeight});
+    }
   }
 
   $startButtonOnePlayer.on('click', () => {
@@ -182,14 +184,6 @@ $(() => {
       startSongTimerId = setTimeout(function() {
         song.play();
       }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
-      stopCreatingArrowsAtEndTimerId = setTimeout(function() {
-        clearInterval(runTimerId);
-        run = false;
-      }, lengthOfSong + startDelay);
-      stopSongAtEndTimerId = setTimeout(function() {
-        song.pause();
-        song.currentTime = 0;
-      }, lengthOfSong + startDelay + endDelay);
     }, 100);
   });
 
@@ -242,8 +236,6 @@ $(() => {
     clearInterval(arrowMoveTimerId);
     clearInterval(arrowProcessTimerId);
     clearTimeout(startSongTimerId);
-    clearTimeout(stopCreatingArrowsAtEndTimerId);
-    clearTimeout(stopSongAtEndTimerId);
     run = false;
     song.pause();
     song.currentTime = 0;
@@ -251,7 +243,7 @@ $(() => {
     $messageAreaPlayer1.text('');
   });
 
-  function loseGame() {
+  function loseGame(player) {
     clearInterval(runTimerId);
     clearInterval(arrowMoveTimerId);
     clearInterval(arrowProcessTimerId);
@@ -259,8 +251,13 @@ $(() => {
     song.pause();
     song.currentTime = 0;
     recordScratch.play();
-    $messageAreaPlayer1.text('YOU LOSE');
     $quitButton.text('Play again');
+    if(player === 'player1') {
+      $messageAreaPlayer1.text('YOU LOSE');
+    }
+    if(player === 'player2') {
+      $messageAreaPlayer2.text('YOU LOSE');
+    }
   }
 
   function deleteArrow($arrow) {
@@ -288,16 +285,23 @@ $(() => {
         deActivate($(element));
       }
       if($(element).position().top <= - $(element).height()/2) {
-        arrowsOnScreen.splice(arrowsOnScreen.indexOf($(element).data('id')), 1);
-        player1Health -= 10;
-        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        if($(element).hasClass('player-one')) {
+          player1Health -= 10;
+          $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        } else {
+          player2Health -= 10;
+          $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
+        }
+        deleteArrow($(element));
         setTimeout(function() {
           cowbell.currentTime = 0;
           cowbell.play();
         }, 100); // This corrects the delay in the cowbell audio file
-        deleteArrow($(element));
         if(player1Health <= 0) {
-          loseGame();
+          loseGame('player1');
+        }
+        if (player2Health <= 0) {
+          loseGame('player2');
         }
       }
     });
@@ -313,12 +317,25 @@ $(() => {
 
   $(window).on('keydown', (e) => {
     const keyPressed = e.which;
-    const $activeArrow = $('.arrow').filter('.active');
-    if($activeArrow.hasClass(keyCodes[keyPressed])) {
-      // player1Score++;
-      console.log($activeArrow.filter(`.${keyCodes[keyPressed]}`));
-      deActivate($activeArrow.filter(`.${keyCodes[keyPressed]}`));
-      deleteArrow($activeArrow.filter(`.${keyCodes[keyPressed]}`));
+    if(twoPlayerMode) {
+      const $activeArrow1 = $('.arrow').filter('.player-one').filter('.active');
+      const $activeArrow2 = $('.arrow').filter('.player-two').filter('.active');
+      if($activeArrow1.hasClass(keyCodes2[keyPressed])) {
+        // player1Score++;
+        deActivate($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
+        deleteArrow($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
+      } else if($activeArrow2.hasClass(keyCodes1[keyPressed])) {
+        // player2Score++;
+        deActivate($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
+        deleteArrow($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
+      }
+    } else {
+      const $activeArrow = $('.arrow').filter('.active');
+      if($activeArrow.hasClass(keyCodes1[keyPressed])) {
+        // player1Score++;
+        deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
+        deleteArrow($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
+      }
     }
   });
 });
