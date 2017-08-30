@@ -15,6 +15,12 @@ main {
 }
 
 div {
+  &.game-container {
+    border: 2px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   &.game-area {
     position: relative;
     display: flex;
@@ -22,8 +28,10 @@ div {
     align-items: center;
     width: $game-width;
     height: $game-height;
-    border: 2px solid #000;
     overflow: hidden;
+    &.player-two {
+      border-left: 1px solid #000;
+    }
   }
   &.active-area {
     position: absolute;
@@ -68,6 +76,9 @@ div {
     &.hit {
       display: none;
     }
+  }
+  &.hidden {
+    display: none;
   }
 }
 

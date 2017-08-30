@@ -15,13 +15,25 @@
     <audio src="../audio/cowbell.mp3" class="cowbell"></audio>
     <audio src="../audio/count.mp3" class="count-sound"></audio>
     <main>
-      <div class="game-area">
-        <button class="start">Start</button>
-        <div class="message-area"></div>
-        <div class="active-area">
-          <button class="quit hidden">Quit</button>
-          <div class="health-bar-container hidden">
-            <div class="health-bar">
+      <div class="game-container">
+        <div class="game-area player-one">
+          <button class="start one-player">Start 1 player</button>
+          <button class="start two-player">Start 2 player</button>
+          <div class="message-area"></div>
+          <div class="active-area">
+            <button class="quit hidden">Quit</button>
+            <div class="health-bar-container hidden">
+              <div class="health-bar">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="game-area player-two hidden">
+          <div class="message-area player-two"></div>
+          <div class="active-area player-two">
+            <div class="health-bar-container player-two hidden">
+              <div class="health-bar player-two">
+              </div>
             </div>
           </div>
         </div>
