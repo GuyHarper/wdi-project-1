@@ -9,38 +9,41 @@
     "postinstall": "gulp deploy"
   },
   "gulp": {
-    "srcDir": "src/",
-    "destDir": "public/",
-    "src": {
-      "js": "src/js/",
-      "scss": "src/scss/",
-      "images": "src/images/"
-    },
-    "dest": {
-      "js": "public/js/",
-      "css": "public/css/",
-      "images": "public/images/"
-    },
-    "main": {
-      "js": "app.js",
-      "index": "index.html",
-      "scss": "style.scss",
-      "server": "index.js",
-      "gulpfile": "gulpfile.js",
-      "packageJson": "package.json"
-    },
-    "output": {
-      "js": "app.js",
-      "css": "style.css"
-    },
-    "selectors": {
-      "all": "*",
-      "js": "**/*.js",
-      "css": "**/*.css",
-      "scss": "**/*.scss",
-      "html": "**/*.html",
-      "images": "**/*.{png,jpg,jpeg,gif,ico}"
-    }
+   "srcDir": "src/",
+   "destDir": "public/",
+   "src": {
+     "js": "src/js/",
+     "scss": "src/scss/",
+     "images": "src/images/",
+     "audio": "src/audio/"
+   },
+   "dest": {
+     "js": "public/js/",
+     "css": "public/css/",
+     "images": "public/images/",
+     "audio": "public/audio/"
+   },
+   "main": {
+     "js": "app.js",
+     "index": "index.html",
+     "scss": "style.scss",
+     "server": "index.js",
+     "gulpfile": "gulpfile.js",
+     "packageJson": "package.json"
+   },
+   "output": {
+     "js": "app.js",
+     "css": "style.css"
+   },
+   "selectors": {
+     "all": "*",
+     "js": "**/*.js",
+     "css": "**/*.css",
+     "scss": "**/*.scss",
+     "html": "**/*.html",
+     "images": "**/*.{png,jpg,jpeg,gif,ico}",
+     "audio": "**/*.{mp3,wav,webm,ogg}"
+   }
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
