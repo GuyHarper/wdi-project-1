@@ -42,6 +42,8 @@ $(() => {
     40: 'down'
   };
   const songPattern = [
+    {type: [1,2,1,2,[1,3],2,1,0], bars: 4},
+    {type: [[3,4],0,[3,4],0,3,1,4,0], bars: 4},
     {type: [1,0,0,0,2,0,0,0], bars: 2},
     {type: [3,0,0,0,4,0,0,0], bars: 2},
     {type: [3,0,4,0,3,0,4,0], bars: 2},
@@ -139,7 +141,8 @@ $(() => {
     const direction = directions[type - 1];
     const $newArrow = $('<div class="arrow"></div>');
     arrowId++;
-    $newArrow.data({id: arrowId, direction: direction});
+    $newArrow.data({id: arrowId});
+    $newArrow.addClass(direction);
     arrowsOnScreen.push(arrowId);
     $gameAreaPlayer1.append($newArrow);
     $newArrow.addClass(direction);
@@ -281,26 +284,21 @@ $(() => {
       if($activeArea.position().top <= $(element).position().top && ($(element).position().top + $(element).height()/2) <= ($activeArea.position().top + $activeArea.height()) && $(element).hasClass('active') === false && !$(element).hasClass('hit')) {
         activate($(element));
       }
-      if($(element).hasClass('hit') === false && $(element).position().top <= - $(element).height()/2) {
-        if ($(element).hasClass('active')) {
-          arrowsOnScreen.splice(arrowsOnScreen.indexOf($(element).data('id')), 1);
-          player1Health -= 10;
-          $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
-          setTimeout(function() {
-            cowbell.currentTime = 0;
-            cowbell.play();
-          }, 100); // This corrects the delay in the cowbell audio file
-          deActivate($(element));
-        }
-        if($(element).position().top <= - $(element).height()) {
-          deleteArrow($(element));
-        }
+      if($(element).position().top <= - $(element).height()/4 && $(element).hasClass('active')) {
+        deActivate($(element));
+      }
+      if($(element).position().top <= - $(element).height()/2) {
+        arrowsOnScreen.splice(arrowsOnScreen.indexOf($(element).data('id')), 1);
+        player1Health -= 10;
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        setTimeout(function() {
+          cowbell.currentTime = 0;
+          cowbell.play();
+        }, 100); // This corrects the delay in the cowbell audio file
+        deleteArrow($(element));
         if(player1Health <= 0) {
           loseGame();
         }
-      }
-      if($(element).hasClass('hit') && $(element).position().top <= 0) {
-        deleteArrow($(element));
       }
     });
   }
@@ -316,10 +314,11 @@ $(() => {
   $(window).on('keydown', (e) => {
     const keyPressed = e.which;
     const $activeArrow = $('.arrow').filter('.active');
-    if($activeArrow.data('direction') === keyCodes[keyPressed]){
+    if($activeArrow.hasClass(keyCodes[keyPressed])) {
       // player1Score++;
-      $activeArrow.addClass('hit');
-      deActivate($activeArrow);
+      console.log($activeArrow.filter(`.${keyCodes[keyPressed]}`));
+      deActivate($activeArrow.filter(`.${keyCodes[keyPressed]}`));
+      deleteArrow($activeArrow.filter(`.${keyCodes[keyPressed]}`));
     }
   });
 });
