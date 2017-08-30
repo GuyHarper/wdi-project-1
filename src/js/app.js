@@ -42,7 +42,6 @@ $(() => {
     83: 'down'
   };
   const songPattern = [
-    {type: [1,2,1,[2,3],1,0,1,0], bars: 4},
     {type: [1,0,0,0,2,0,0,0], bars: 2},
     {type: [3,0,0,0,4,0,0,0], bars: 2},
     {type: [3,0,4,0,3,0,4,0], bars: 2},
@@ -51,8 +50,10 @@ $(() => {
     {type: [3,0,1,0,4,0,1,0], bars: 4},
     {type: [1,0,[1,2],0,3,0,4,0], bars: 4},
     {type: [3,0,[3,4],0,3,0,1,0], bars: 4},
-    {type: [1,2,1,[2,3],1,0,1,0], bars: 4},
-    {type: [[3,4],0,[3,4],0,3,1,4,0], bars: 4}
+    {type: [[1,3],0,2,0,[1,3],0,2,0], bars: 2},
+    {type: [[1,4],0,3,0,[2,3],0,3,0], bars: 2},
+    {type: [1,2,1,0,[1,3],0,1,0], bars: 2},
+    {type: [[1,3],0,[2,3],0,[4,3],0,[1,3],0], bars: 2}
   ];
 
   function twoPlayerSetup() {
@@ -129,7 +130,6 @@ $(() => {
 
   function createArrow(type) {
     if(twoPlayerMode) {
-      console.log(twoPlayerMode);
       const directions = ['left','up','right','down'];
       const direction = directions[type - 1];
       const $newArrow1 = $('<div class="arrow player-one"></div>');
@@ -268,12 +268,6 @@ $(() => {
     $arrow.remove();
   }
 
-  // function moveArrow($arrow) {
-  //   const $arrowY = $arrow.position();
-  //   $arrow.css({top: $arrowY.top - ($gameAreaPlayer1.height() - ($activeArea.height() - $arrow.height()/2) - $arrow.height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
-  //   return $arrowY;
-  // }
-
   function moveArrows() {
     $('.arrow').each((index, element) => {
       $(element).css({top: $(element).position().top - ($gameAreaPlayer1.height() - ($activeArea.height() - $(element).height()/2) - $(element).height()) * 0.01 / (arrowRate * 60 / beatsPerMinute)});
@@ -282,7 +276,6 @@ $(() => {
 
   function arrowProcess() {
     $('.arrow').each((index, element) => {
-      console.log(player1Health);
       if($activeArea.position().top <= $(element).position().top && ($(element).position().top + $(element).height()/2) <= ($activeArea.position().top + $activeArea.height()) && $(element).hasClass('active') === false) {
         activate($(element));
       }
@@ -333,14 +326,31 @@ $(() => {
         // player2Score++;
         deActivate($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
         deleteArrow($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
+      } else if (keyCodes2[keyPressed] !== -1){
+        player1Health -= 2;
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+      } else if (keyCodes1[keyPressed] !== -1){
+        player2Health -= 2;
+        $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
+      }
+      if(player1Health <= 0) {
+        loseGame('player1');
+      }
+      if (player2Health <= 0) {
+        loseGame('player2');
       }
     } else {
       const $activeArrow = $('.arrow').filter('.active');
-      // console.log(`${keyCodes1[keyPressed]}`,$activeArrow.filter(`.${keyCodes1[keyPressed]}`));
       if($activeArrow.hasClass(keyCodes1[keyPressed])) {
         // player1Score++;
         deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
         deleteArrow($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
+      } else if (keyCodes2[keyPressed] !== -1){
+        player1Health -= 2;
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+      }
+      if(player1Health <= 0) {
+        loseGame('player1');
       }
     }
   });
