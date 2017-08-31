@@ -29,12 +29,13 @@ $(() => {
   const recordScratch = document.querySelector('.record-scratch');
   const cowbell = document.querySelector('.cowbell');
   const countSound = document.querySelector('.count-sound');
-  const beatsPerMinute = 116.73;
-  const startDelay = 0; // Number of milliseconds until first beat in audio file
+  const beatsPerMinute = 122.9505;
+  const startDelay = 2750; // Number of milliseconds until first beat in audio file
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let run = false;
   let runTimerId = null;
-  let startSongTimerId = null;
+  let startArrowsTimerId = null;
+  let arrowProcessStartTimerId = null;
   let arrowProcessTimerId = null;
   let arrowMoveTimerId = null;
   let runCountDownId = null;
@@ -70,21 +71,46 @@ $(() => {
     83: $player1InputArrowDown
   };
   const songPattern = [
-    {type: [1,0,0,0,2,0,0,0], bars: 2},
-    {type: [3,0,0,0,4,0,0,0], bars: 2},
-    {type: [3,0,4,0,3,0,4,0], bars: 2},
-    {type: [3,0,1,0,3,0,1,0], bars: 2},
+    {type: [4,0,0,0,0,0,0,0], bars: 1},
+    {type: [3,0,0,0,0,0,0,0], bars: 1},
+    {type: [2,0,0,0,0,0,0,0], bars: 1},
+    {type: [1,0,0,0,0,0,0,0], bars: 1},
+    {type: [4,0,0,0,0,0,0,0], bars: 1},
+    {type: [3,0,0,0,0,0,0,0], bars: 1},
+    {type: [2,0,0,0,0,0,0,0], bars: 1},
+    {type: [[1,4],0,0,0,0,0,0,0], bars: 1},
+    {type: [1,0,2,0,4,0,4,0], bars: 2},
+    {type: [3,0,3,0,2,0,1,0], bars: 2},
+    {type: [1,0,2,0,4,0,4,0], bars: 2},
+    {type: [3,0,3,0,2,0,1,0], bars: 2},
     {type: [1,0,2,0,3,0,4,0], bars: 4},
-    {type: [3,0,1,0,4,0,1,0], bars: 4},
-    {type: [1,0,[1,2],0,3,0,4,0], bars: 4},
-    {type: [3,0,[3,4],0,3,0,1,0], bars: 4},
-    {type: [[1,3],0,2,0,[1,3],0,2,0], bars: 2},
-    {type: [[1,4],0,3,0,[2,3],0,3,0], bars: 2},
-    {type: [1,2,1,0,[1,3],0,1,0], bars: 2},
-    {type: [[1,3],0,[2,3],0,[4,3],0,[1,3],0], bars: 2}
+    {type: [3,0,1,0,4,0,1,0], bars: 2},
+    {type: [[1,4],0,3,0,[1,4],0,3,0], bars: 1},
+    {type: [0,0,0,0,0,0,0,0], bars: 1},
+    {type: [0,0,4,4,4,3,3,1], bars: 1},
+    {type: [1,0,0,0,0,0,0,0], bars: 1},
+    {type: [0,0,4,4,4,3,3,1], bars: 1},
+    {type: [1,0,0,0,0,0,0,0], bars: 1},
+    {type: [0,0,[4,3],[4,3],[4,3],3,3,1], bars: 1},
+    {type: [1,0,0,0,0,0,0,0], bars: 1},
+    {type: [0,0,[4,3],[4,3],[4,3],[3,1],[3,1],1], bars: 1},
+    {type: [1,0,0,0,0,0,0,0], bars: 1},
+    {type: [0,0,[4,3],[4,3],[4,3],[3,1],[3,1],[1,4]], bars: 1},
+    {type: [[1,4],0,0,0,0,0,0,0], bars: 1},
+    {type: [0,0,4,4,4,3,3,1], bars: 1},
+    {type: [1,4,3,1,1,4,1,0], bars: 1},
+    {type: [[4,1],0,[3,1],0,[4,1],0,[3,1],0], bars: 2},
+    {type: [[4,1],1,[3,1],1,[4,1],1,[3,1],1], bars: 2},
+    {type: [0,0,0,0,4,3,1,0], bars: 3},
+    {type: [[4,3],1,[4,3],1,[4,3],1,[1,4],0], bars: 1},
+    {type: [0,0,0,0,4,3,1,0], bars: 3},
+    {type: [[4,3],1,[4,3],1,[4,3],1,[1,4],0], bars: 1},
+    
+    {type: [[4,3],1,[4,3],1,3,1,2,1], bars: 2}
   ];
 
   $startButtonOnePlayer.on('click', () => {
+    console.log('got here');
     setTimeout(function() {
       $messageAreaPlayer1.text('');
       $titleAndButtonsOnePlayer.addClass('hidden');
@@ -95,7 +121,7 @@ $(() => {
       setTimeout(function() {
         countSound.play();
         countDown();
-      }, 240); // This corrects the delay in the countdown audio file
+      }, 240 + startDelay - 4 * 1000 * 60 / beatsPerMinute); // The 240ms corrects the delay in the countdown audio file
       setTimeout(function() {
         $quitButton.removeClass('hidden');
         $quitButton.text('Quit');
@@ -107,19 +133,19 @@ $(() => {
         player1Health = 100;
         player2Health = 100;
         $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
-        runSong(songPattern);
+        startArrowsTimerId = setTimeout(function() {
+          runSong(songPattern);
+        }, startDelay - 4 * 1000 * 60 / beatsPerMinute);
         arrowMoveTimerId = setInterval(function() {
           moveArrows();
         }, 10);
-        setTimeout(function() {
+        arrowProcessStartTimerId = setTimeout(function() {
           arrowProcessTimerId = setInterval(function() {
             arrowProcess();
           }, 1000 * 60/beatsPerMinute / 2);
-        }, 50);
+        }, startDelay - 4 * 1000 * 60 / beatsPerMinute + 50);
         run = true;
-        startSongTimerId = setTimeout(function() {
-          song.play();
-        }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
+        song.play();
       }, 100);
     }, 100);
   });
@@ -138,7 +164,7 @@ $(() => {
       setTimeout(function() {
         countSound.play();
         countDown();
-      }, 240); // This corrects the delay in the countdown audio file
+      }, 240 + startDelay - 4 * 1000 * 60 / beatsPerMinute); // This corrects the delay in the countdown audio file
       setTimeout(function() {
         $quitButton.removeClass('hidden');
         $quitButton.text('Quit');
@@ -152,19 +178,19 @@ $(() => {
         player2Health = 100;
         $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
         $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
-        runSong(songPattern);
+        startArrowsTimerId = setTimeout(function() {
+          runSong(songPattern);
+        }, startDelay - 4 * 1000 * 60 / beatsPerMinute);
         arrowMoveTimerId = setInterval(function() {
           moveArrows();
         }, 10);
-        setTimeout(function() {
+        arrowProcessStartTimerId = setTimeout(function() {
           arrowProcessTimerId = setInterval(function() {
             arrowProcess();
           }, 1000 * 60/beatsPerMinute / 2);
-        }, 50);
+        }, startDelay - 4 * 1000 * 60 / beatsPerMinute + 50);
         run = true;
-        startSongTimerId = setTimeout(function() {
-          song.play();
-        }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
+        song.play();
       }, 100);
     }, 100);
   });
@@ -184,7 +210,8 @@ $(() => {
       clearInterval(runTimerId);
       clearInterval(arrowMoveTimerId);
       clearInterval(arrowProcessTimerId);
-      clearTimeout(startSongTimerId);
+      clearTimeout(startArrowsTimerId);
+      clearTimeout(arrowProcessStartTimerId);
       run = false;
       song.pause();
       song.currentTime = 0;
@@ -230,7 +257,7 @@ $(() => {
 
   function createArrow(type) {
     if(twoPlayerMode) {
-      const directions = ['left','up','right','down'];
+      const directions = ['left','up','down','right'];
       const direction = directions[type - 1];
       const $newArrow1 = $('<div class="arrow player-one"></div>');
       const $newArrow2 = $('<div class="arrow player-two"></div>');
@@ -243,7 +270,7 @@ $(() => {
       $newArrow1.css({top: gameHeight-arrowHeight});
       $newArrow2.css({top: gameHeight-arrowHeight});
     } else {
-      const directions = ['left','up','right','down'];
+      const directions = ['left','up','down','right'];
       const direction = directions[type - 1];
       const $newArrow = $('<div class="arrow player-one"></div>');
       $newArrow.addClass(direction);
@@ -257,35 +284,52 @@ $(() => {
 
   function countDown() {
     let count = 4;
-    $messageAreaPlayer1.text(count);
-    $messageAreaPlayer2.text(count);
+    $messageAreaPlayer1.text('Get');
+    $messageAreaPlayer2.text('Get');
     count--;
     if(twoPlayerMode) {
       runCountDownId = setInterval(function() {
-        if(count > 0 ) {
-          $messageAreaPlayer1.text(count);
-          $messageAreaPlayer2.text(count);
-          countSound.play();
-        } else if(count === 0) {
-          $messageAreaPlayer1.text('GO');
-          $messageAreaPlayer2.text('GO');
-        } else {
-          $messageAreaPlayer1.text('');
-          $messageAreaPlayer2.text('');
-          clearInterval(runCountDownId);
+        switch(count) {
+          case 3:
+            $messageAreaPlayer1.text('your fingers');
+            $messageAreaPlayer2.text('your fingers');
+            countSound.play();
+            break;
+          case 2:
+            $messageAreaPlayer1.text('ready to');
+            $messageAreaPlayer2.text('ready to');
+            countSound.play();
+            break;
+          case 1:
+            $messageAreaPlayer1.text('DANCE');
+            $messageAreaPlayer2.text('DANCE');
+            countSound.play();
+            break;
+          default:
+            $messageAreaPlayer1.text('');
+            $messageAreaPlayer2.text('');
+            clearInterval(runCountDownId);
         }
         count--;
       }, 1000 * 60/beatsPerMinute);
     } else {
       runCountDownId = setInterval(function() {
-        if(count > 0 ) {
-          $messageAreaPlayer1.text(count);
-          countSound.play();
-        } else if(count === 0) {
-          $messageAreaPlayer1.text('GO');
-        } else {
-          $messageAreaPlayer1.text('');
-          clearInterval(runCountDownId);
+        switch(count) {
+          case 3:
+            $messageAreaPlayer1.text('your fingers');
+            countSound.play();
+            break;
+          case 2:
+            $messageAreaPlayer1.text('ready to');
+            countSound.play();
+            break;
+          case 1:
+            $messageAreaPlayer1.text('DANCE');
+            countSound.play();
+            break;
+          default:
+            $messageAreaPlayer1.text('');
+            clearInterval(runCountDownId);
         }
         count--;
       }, 1000 * 60/beatsPerMinute);
@@ -383,6 +427,10 @@ $(() => {
         $messageAreaPlayer1.text('');
         if($activeArrow1.position().top >= $activeArea.height()/2 - $activeArrow1.height()/2 - 4 && $activeArrow1.position().top <= $activeArea.height()/2 - $activeArrow1.height()/2 + 4) {
           $messageAreaPlayer1.text('Perfect');
+          if(player1Health < 100) {
+            player1Health += 2;
+            $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+          }
         }
         deActivate($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
         deleteArrow($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
@@ -391,6 +439,10 @@ $(() => {
         $messageAreaPlayer2.text('');
         if($activeArrow2.position().top >= $activeArea.height()/2 - $activeArrow2.height()/2 - 4 && $activeArrow2.position().top <= $activeArea.height()/2 - $activeArrow2.height()/2 + 4) {
           $messageAreaPlayer2.text('Perfect');
+          if(player2Health < 100) {
+            player2Health += 2;
+            $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
+          }
         }
         deActivate($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
         deleteArrow($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
@@ -414,6 +466,10 @@ $(() => {
         $messageAreaPlayer1.text('');
         if($activeArrow.position().top >= $activeArea.height()/2 - $activeArrow.height()/2 - 4 && $activeArrow.position().top <= $activeArea.height()/2 - $activeArrow.height()/2 + 4) {
           $messageAreaPlayer1.text('Perfect');
+          if(player1Health < 100) {
+            player1Health += 2;
+            $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+          }
         }
         deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
         deleteArrow($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
