@@ -11,6 +11,16 @@ $(() => {
   const $player1HealthBar = $('.health-bar.player-one');
   const $player2HealthBarContainer = $('.health-bar-container.player-two');
   const $player2HealthBar = $('.health-bar.player-two');
+  const $player1InputArrows = $('.input-arrow-container.player-one');
+  const $player1InputArrowLeft = $('.input-arrow.left.player-one');
+  const $player1InputArrowUp = $('.input-arrow.up.player-one');
+  const $player1InputArrowDown = $('.input-arrow.down.player-one');
+  const $player1InputArrowRight = $('.input-arrow.right.player-one');
+  const $player2InputArrowLeft = $('.input-arrow.left.player-two');
+  const $player2InputArrowUp = $('.input-arrow.up.player-two');
+  const $player2InputArrowDown = $('.input-arrow.down.player-two');
+  const $player2InputArrowRight = $('.input-arrow.right.player-two');
+  const $player2InputArrows = $('.input-arrow-container.player-two');
   const $messageAreaPlayer1 = $('.message-area.player-one');
   const $messageAreaPlayer2 = $('.message-area.player-two');
   let player1Health = 100;
@@ -43,6 +53,22 @@ $(() => {
     68: 'right',
     83: 'down'
   };
+  const onePlayerKeyHighlights = {
+    37: $player1InputArrowLeft,
+    38: $player1InputArrowUp,
+    39: $player1InputArrowRight,
+    40: $player1InputArrowDown
+  };
+  const twoPlayerKeyHighlights = {
+    37: $player2InputArrowLeft,
+    38: $player2InputArrowUp,
+    39: $player2InputArrowRight,
+    40: $player2InputArrowDown,
+    65: $player1InputArrowLeft,
+    87: $player1InputArrowUp,
+    68: $player1InputArrowRight,
+    83: $player1InputArrowDown
+  };
   const songPattern = [
     {type: [1,0,0,0,2,0,0,0], bars: 2},
     {type: [3,0,0,0,4,0,0,0], bars: 2},
@@ -62,6 +88,7 @@ $(() => {
     setTimeout(function() {
       $messageAreaPlayer1.text('');
       $titleAndButtonsOnePlayer.addClass('hidden');
+      $player1InputArrows.removeClass('hidden');
       if(twoPlayerMode) {
         twoPlayerMode = false;
       }
@@ -79,7 +106,7 @@ $(() => {
         player1Score = 0;
         player1Health = 100;
         player2Health = 100;
-        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
         runSong(songPattern);
         arrowMoveTimerId = setInterval(function() {
           moveArrows();
@@ -101,6 +128,8 @@ $(() => {
     setTimeout(function() {
       $messageAreaPlayer1.text('');
       $messageAreaPlayer2.text('');
+      $player1InputArrows.removeClass('hidden');
+      $player2InputArrows.removeClass('hidden');
       $titleAndButtonsOnePlayer.addClass('hidden');
       $gameAreaPlayer2.removeClass('hidden');
       if(!twoPlayerMode) {
@@ -112,7 +141,7 @@ $(() => {
       }, 240); // This corrects the delay in the countdown audio file
       setTimeout(function() {
         $quitButton.removeClass('hidden');
-        $quitButton.text('Quit & return to menu');
+        $quitButton.text('Quit');
         $player1HealthBarContainer.removeClass('hidden');
         $player2HealthBarContainer.removeClass('hidden');
         $messageAreaPlayer1.removeClass('hidden');
@@ -121,8 +150,8 @@ $(() => {
         player1Health = 100;
         player2Score = 0;
         player2Health = 100;
-        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
-        $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+        $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
         runSong(songPattern);
         arrowMoveTimerId = setInterval(function() {
           moveArrows();
@@ -142,9 +171,10 @@ $(() => {
 
   $quitButton.on('click', () => {
     setTimeout(function() {
-      const $player2HealthBarContainer = $('.health-bar-container.player-two');
       $quitButton.addClass('hidden');
       $gameAreaPlayer2.addClass('hidden');
+      $player1InputArrows.addClass('hidden');
+      $player2InputArrows.addClass('hidden');
       $titleAndButtonsOnePlayer.removeClass('hidden');
       $player1HealthBarContainer.addClass('hidden');
       $player2HealthBarContainer.addClass('hidden');
@@ -300,10 +330,10 @@ $(() => {
       if($(element).position().top <= - $(element).height()/2) {
         if($(element).hasClass('player-one')) {
           player1Health -= 10;
-          $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+          $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
         } else {
           player2Health -= 10;
-          $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
+          $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
         }
         deleteArrow($(element));
         setTimeout(function() {
@@ -328,8 +358,23 @@ $(() => {
     $arrow.removeClass('active');
   }
 
+  function highlight(key) {
+    if(!twoPlayerMode) {
+      $(onePlayerKeyHighlights[key]).addClass('pressed');
+      setTimeout(function() {
+        $(onePlayerKeyHighlights[key]).removeClass('pressed');
+      },100);
+    } else {
+      $(twoPlayerKeyHighlights[key]).addClass('pressed');
+      setTimeout(function() {
+        $(twoPlayerKeyHighlights[key]).removeClass('pressed');
+      },100);
+    }
+  }
+
   $(window).on('keydown', (e) => {
     const keyPressed = e.which;
+    highlight(keyPressed);
     if(twoPlayerMode) {
       const $activeArrow1 = $('.arrow').filter('.player-one').filter('.active');
       const $activeArrow2 = $('.arrow').filter('.player-two').filter('.active');
@@ -351,10 +396,10 @@ $(() => {
         deleteArrow($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
       } else if (keyCodes2[keyPressed] !== -1){
         player1Health -= 2;
-        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
       } else if (keyCodes1[keyPressed] !== -1){
         player2Health -= 2;
-        $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
+        $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
       }
       if(player1Health <= 0) {
         loseGame('player1');
@@ -374,7 +419,7 @@ $(() => {
         deleteArrow($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
       } else if (keyCodes2[keyPressed] !== -1){
         player1Health -= 2;
-        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
       }
       if(player1Health <= 0) {
         loseGame('player1');
