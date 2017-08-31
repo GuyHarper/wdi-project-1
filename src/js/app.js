@@ -381,7 +381,7 @@ $(() => {
       if($activeArrow1.hasClass(keyCodes2[keyPressed])) {
         // player1Score++;
         $messageAreaPlayer1.text('');
-        if($activeArrow1.position().top >= $activeArea.position().top - $activeArea.height() + $activeArrow1.height() - 4 && $activeArrow1.position().top <= $activeArea.position().top - $activeArea.height() + $activeArrow1.height() + 4) {
+        if($activeArrow1.position().top >= $activeArea.height()/2 - $activeArrow1.height()/2 - 4 && $activeArrow1.position().top <= $activeArea.height()/2 - $activeArrow1.height()/2 + 4) {
           $messageAreaPlayer1.text('Perfect');
         }
         deActivate($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
@@ -389,7 +389,7 @@ $(() => {
       } else if($activeArrow2.hasClass(keyCodes1[keyPressed])) {
         // player2Score++;
         $messageAreaPlayer2.text('');
-        if($activeArrow2.position().top >= $activeArea.position().top - $activeArea.height() + $activeArrow2.height() - 4 && $activeArrow2.position().top <= $activeArea.position().top - $activeArea.height() + $activeArrow2.height() + 4) {
+        if($activeArrow2.position().top >= $activeArea.height()/2 - $activeArrow2.height()/2 - 4 && $activeArrow2.position().top <= $activeArea.height()/2 - $activeArrow2.height()/2 + 4) {
           $messageAreaPlayer2.text('Perfect');
         }
         deActivate($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
@@ -412,7 +412,7 @@ $(() => {
       if($activeArrow.hasClass(keyCodes1[keyPressed])) {
         // player1Score++;
         $messageAreaPlayer1.text('');
-        if($activeArrow.position().top >= $activeArea.position().top - $activeArea.height() + $activeArrow.height() - 4 && $activeArrow.position().top <= $activeArea.position().top - $activeArea.height() + $activeArrow.height() + 4) {
+        if($activeArrow.position().top >= $activeArea.height()/2 - $activeArrow.height()/2 - 4 && $activeArrow.position().top <= $activeArea.height()/2 - $activeArrow.height()/2 + 4) {
           $messageAreaPlayer1.text('Perfect');
         }
         deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
