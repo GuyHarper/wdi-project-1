@@ -2,6 +2,7 @@ $(() => {
   const $gameContainer = $('.game-container');
   const $gameAreaPlayer1 = $('.game-area.player-one');
   const $gameAreaPlayer2 = $('.game-area.player-two');
+  const $titleAndButtonsOnePlayer = $('.title-and-buttons-container.one-player');
   const $startButtonOnePlayer = $('button.start.one-player');
   const $startButtonTwoPlayer = $('button.start.two-player');
   const $quitButton = $('button.quit');
@@ -18,7 +19,7 @@ $(() => {
   const recordScratch = document.querySelector('.record-scratch');
   const cowbell = document.querySelector('.cowbell');
   const countSound = document.querySelector('.count-sound');
-  const beatsPerMinute = 116.73151750; // 51 is too fast;
+  const beatsPerMinute = 116.73;
   const startDelay = 0; // Number of milliseconds until first beat in audio file
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let run = false;
@@ -26,6 +27,7 @@ $(() => {
   let startSongTimerId = null;
   let arrowProcessTimerId = null;
   let arrowMoveTimerId = null;
+  let runCountDownId = null;
   let player1Score = null;
   let player2Score = null;
   let twoPlayerMode = false;
@@ -42,7 +44,6 @@ $(() => {
     83: 'down'
   };
   const songPattern = [
-    {type: [2,0,2,0,2,0,2,0], bars: 100},
     {type: [1,0,0,0,2,0,0,0], bars: 2},
     {type: [3,0,0,0,4,0,0,0], bars: 2},
     {type: [3,0,4,0,3,0,4,0], bars: 2},
@@ -57,47 +58,112 @@ $(() => {
     {type: [[1,3],0,[2,3],0,[4,3],0,[1,3],0], bars: 2}
   ];
 
+  $startButtonOnePlayer.on('click', () => {
+    setTimeout(function() {
+      $titleAndButtonsOnePlayer.addClass('hidden');
+      if(twoPlayerMode) {
+        twoPlayerMode = false;
+      }
+      setTimeout(function() {
+        countSound.play();
+        countDown();
+      }, 240); // This corrects the delay in the countdown audio file
+      setTimeout(function() {
+        $quitButton.removeClass('hidden');
+        $quitButton.text('Quit & return to menu');
+        $player1HealthBarContainer.removeClass('hidden');
+        $player2HealthBarContainer.addClass('hidden');
+        $messageAreaPlayer1.removeClass('hidden');
+        $gameAreaPlayer2.addClass('hidden');
+        player1Score = 0;
+        player1Health = 100;
+        player2Health = 100;
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        runSong(songPattern);
+        arrowMoveTimerId = setInterval(function() {
+          moveArrows();
+        }, 10);
+        setTimeout(function() {
+          arrowProcessTimerId = setInterval(function() {
+            arrowProcess();
+          }, 1000 * 60/beatsPerMinute / 2);
+        }, 50);
+        run = true;
+        startSongTimerId = setTimeout(function() {
+          song.play();
+        }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
+      }, 100);
+    }, 100);
+  });
+
+  $startButtonTwoPlayer.on('click',() => {
+    setTimeout(function() {
+      $titleAndButtonsOnePlayer.addClass('hidden');
+      if(!twoPlayerMode) {
+        twoPlayerSetup();
+      }
+      setTimeout(function() {
+        countSound.play();
+        countDown();
+      }, 240); // This corrects the delay in the countdown audio file
+      setTimeout(function() {
+        $quitButton.removeClass('hidden');
+        $quitButton.text('Quit & return to menu');
+        $player1HealthBarContainer.removeClass('hidden');
+        $player2HealthBarContainer.removeClass('hidden');
+        $messageAreaPlayer1.removeClass('hidden');
+        $messageAreaPlayer2.removeClass('hidden');
+        player1Score = 0;
+        player1Health = 100;
+        player2Score = 0;
+        player2Health = 100;
+        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
+        $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
+        runSong(songPattern);
+        arrowMoveTimerId = setInterval(function() {
+          moveArrows();
+        }, 10);
+        setTimeout(function() {
+          arrowProcessTimerId = setInterval(function() {
+            arrowProcess();
+          }, 1000 * 60/beatsPerMinute / 2);
+        }, 50);
+        run = true;
+        startSongTimerId = setTimeout(function() {
+          song.play();
+        }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
+      }, 100);
+    }, 100);
+  });
+
+  $quitButton.on('click', () => {
+    setTimeout(function() {
+      const $player2HealthBarContainer = $('.health-bar-container.player-two');
+      $quitButton.addClass('hidden');
+      $gameAreaPlayer2.addClass('hidden');
+      $titleAndButtonsOnePlayer.removeClass('hidden');
+      $player1HealthBarContainer.addClass('hidden');
+      $player2HealthBarContainer.addClass('hidden');
+      $messageAreaPlayer1.addClass('hidden');
+      $messageAreaPlayer2.addClass('hidden');
+      $('.arrow').remove();
+      clearInterval(runTimerId);
+      clearInterval(arrowMoveTimerId);
+      clearInterval(arrowProcessTimerId);
+      clearTimeout(startSongTimerId);
+      run = false;
+      song.pause();
+      song.currentTime = 0;
+      recordScratch.play();
+      clearInterval(runCountDownId);
+      $messageAreaPlayer1.text('');
+    }, 100);
+  });
+
   function twoPlayerSetup() {
     $gameAreaPlayer2.removeClass('hidden');
     twoPlayerMode = true;
   }
-
-  $startButtonTwoPlayer.on('click',() => {
-    if(!twoPlayerMode) {
-      twoPlayerSetup();
-    }
-    setTimeout(function() {
-      countSound.play();
-      countDown();
-    }, 240); // This corrects the delay in the countdown audio file
-    setTimeout(function() {
-      $startButtonOnePlayer.addClass('hidden');
-      $startButtonTwoPlayer.addClass('hidden');
-      $quitButton.removeClass('hidden');
-      $quitButton.text('Quit & return to menu');
-      $player1HealthBarContainer.removeClass('hidden');
-      $player2HealthBarContainer.removeClass('hidden');
-      player1Score = 0;
-      player1Health = 100;
-      player2Score = 0;
-      player2Health = 100;
-      $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
-      $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.6}px`);
-      runSong(songPattern);
-      arrowMoveTimerId = setInterval(function() {
-        moveArrows();
-      }, 10);
-      setTimeout(function() {
-        arrowProcessTimerId = setInterval(function() {
-          arrowProcess();
-        }, 1000 * 60/beatsPerMinute / 2);
-      }, 50);
-      run = true;
-      startSongTimerId = setTimeout(function() {
-        song.play();
-      }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
-    }, 100);
-  });
 
   function runSong(pattern) {
     const wholeSongPattern = [];
@@ -156,49 +222,13 @@ $(() => {
     }
   }
 
-  $startButtonOnePlayer.on('click', () => {
-    if(twoPlayerMode) {
-      twoPlayerMode = false;
-    }
-    setTimeout(function() {
-      countSound.play();
-      countDown();
-    }, 240); // This corrects the delay in the countdown audio file
-    setTimeout(function() {
-      $startButtonOnePlayer.addClass('hidden');
-      $startButtonTwoPlayer.addClass('hidden');
-      $quitButton.removeClass('hidden');
-      $quitButton.text('Quit & return to menu');
-      $player1HealthBarContainer.removeClass('hidden');
-      $player2HealthBarContainer.addClass('hidden');
-      $gameAreaPlayer2.addClass('hidden');
-      player1Score = 0;
-      player1Health = 100;
-      player2Health = 100;
-      $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.6}px`);
-      runSong(songPattern);
-      arrowMoveTimerId = setInterval(function() {
-        moveArrows();
-      }, 10);
-      setTimeout(function() {
-        arrowProcessTimerId = setInterval(function() {
-          arrowProcess();
-        }, 1000 * 60/beatsPerMinute / 2);
-      }, 50);
-      run = true;
-      startSongTimerId = setTimeout(function() {
-        song.play();
-      }, 4 * 1000 * 60 / beatsPerMinute + startDelay);
-    }, 100);
-  });
-
   function countDown() {
     let count = 4;
     $messageAreaPlayer1.text(count);
     $messageAreaPlayer2.text(count);
     count--;
     if(twoPlayerMode) {
-      const runCountDownId = setInterval(function() {
+      runCountDownId = setInterval(function() {
         if(count > 0 ) {
           $messageAreaPlayer1.text(count);
           $messageAreaPlayer2.text(count);
@@ -214,7 +244,7 @@ $(() => {
         count--;
       }, 1000 * 60/beatsPerMinute);
     } else {
-      const runCountDownId = setInterval(function() {
+      runCountDownId = setInterval(function() {
         if(count > 0 ) {
           $messageAreaPlayer1.text(count);
           countSound.play();
@@ -228,25 +258,6 @@ $(() => {
       }, 1000 * 60/beatsPerMinute);
     }
   }
-
-  $quitButton.on('click', () => {
-    const $player2HealthBarContainer = $('.health-bar-container.player-two');
-    $quitButton.addClass('hidden');
-    $startButtonOnePlayer.removeClass('hidden');
-    $startButtonTwoPlayer.removeClass('hidden');
-    $player1HealthBarContainer.addClass('hidden');
-    $player2HealthBarContainer.addClass('hidden');
-    $('.arrow').remove();
-    clearInterval(runTimerId);
-    clearInterval(arrowMoveTimerId);
-    clearInterval(arrowProcessTimerId);
-    clearTimeout(startSongTimerId);
-    run = false;
-    song.pause();
-    song.currentTime = 0;
-    recordScratch.play();
-    $messageAreaPlayer1.text('');
-  });
 
   function loseGame(player) {
     clearInterval(runTimerId);
