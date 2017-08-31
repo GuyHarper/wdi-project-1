@@ -60,6 +60,7 @@ $(() => {
 
   $startButtonOnePlayer.on('click', () => {
     setTimeout(function() {
+      $messageAreaPlayer1.text('');
       $titleAndButtonsOnePlayer.addClass('hidden');
       if(twoPlayerMode) {
         twoPlayerMode = false;
@@ -70,7 +71,7 @@ $(() => {
       }, 240); // This corrects the delay in the countdown audio file
       setTimeout(function() {
         $quitButton.removeClass('hidden');
-        $quitButton.text('Quit & return to menu');
+        $quitButton.text('Quit');
         $player1HealthBarContainer.removeClass('hidden');
         $player2HealthBarContainer.addClass('hidden');
         $messageAreaPlayer1.removeClass('hidden');
@@ -98,7 +99,10 @@ $(() => {
 
   $startButtonTwoPlayer.on('click',() => {
     setTimeout(function() {
+      $messageAreaPlayer1.text('');
+      $messageAreaPlayer2.text('');
       $titleAndButtonsOnePlayer.addClass('hidden');
+      $gameAreaPlayer2.removeClass('hidden');
       if(!twoPlayerMode) {
         twoPlayerSetup();
       }
@@ -161,7 +165,6 @@ $(() => {
   });
 
   function twoPlayerSetup() {
-    $gameAreaPlayer2.removeClass('hidden');
     twoPlayerMode = true;
   }
 

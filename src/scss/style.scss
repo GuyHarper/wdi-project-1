@@ -1,11 +1,12 @@
 @import "variables";
 
 html, body {
-  background-color: #000;
+  background-color: #333;
   color: #fff;
   height: 100%;
   margin: 0;
   font-family: 'Codystar', sans-serif;
+  cursor: default;
 }
 
 main {
@@ -106,10 +107,6 @@ div {
 h1 {
   text-align: center;
   font-size: 2.5em;
-}
-
-h1:hover {
-  cursor: default;
 }
 
 button {
