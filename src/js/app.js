@@ -203,6 +203,10 @@ $(() => {
         player2Health = 100;
         $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
         $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
+        $player1InputArrowLeft.text('A');
+        $player1InputArrowUp.text('W');
+        $player1InputArrowDown.text('S');
+        $player1InputArrowRight.text('D');
         startArrowsTimerId = setTimeout(function() {
           runSong(songPattern);
         }, startDelay - 4 * 1000 * 60 / beatsPerMinute);
@@ -316,29 +320,33 @@ $(() => {
   function countDown() {
     let count = 4;
     if(twoPlayerMode) {
-      $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>Get');
+      $messageAreaPlayer1.text('Get');
       $messageAreaPlayer2.text('Get');
       count--;
       runCountDownId = setInterval(function() {
         switch(count) {
           case 3:
-            $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>your fingers');
+            $messageAreaPlayer1.text('your fingers');
             $messageAreaPlayer2.text('your fingers');
             countSound.play();
             break;
           case 2:
-            $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>ready to');
+            $messageAreaPlayer1.text('ready to');
             $messageAreaPlayer2.text('ready to');
             countSound.play();
             break;
           case 1:
-            $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>DANCE');
+            $messageAreaPlayer1.text('DANCE');
             $messageAreaPlayer2.text('DANCE');
             countSound.play();
             break;
           default:
             $messageAreaPlayer1.text('');
             $messageAreaPlayer2.text('');
+            $player1InputArrowLeft.text('');
+            $player1InputArrowUp.text('');
+            $player1InputArrowDown.text('');
+            $player1InputArrowRight.text('');
             clearInterval(runCountDownId);
         }
         count--;
