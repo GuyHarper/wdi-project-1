@@ -450,7 +450,7 @@ $(() => {
     song.currentTime = 0;
     recordScratch.play();
     $quitButton.text('Play again');
-    const percentage = currentBeat / beatsInSong * 100;
+    const percentage = currentBeat / beatsInSong * 2 * 100;
     run = false;
     if(player === 'player1') {
       $messageAreaPlayer1.html(`YOU LOSE<br><br>You made it ${Math.floor(percentage)}% of the way through the song, hitting ${player1Score} arrows with ${player1Perfects} perfects out of a possible ${Math.round(numberOfPossibleArrows)}.`);
