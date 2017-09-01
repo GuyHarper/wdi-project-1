@@ -30,6 +30,7 @@ $(() => {
   const cowbell = document.querySelector('.cowbell');
   const countSound = document.querySelector('.count-sound');
   const beatsPerMinute = 122.9505;
+  const beatsInSong = 512;
   const startDelay = 2750; // Number of milliseconds until first beat in audio file
   const arrowRate = 4; // Number of beats that arrow is visible on screen until it gets to the middle of the active area
   let run = false;
@@ -39,8 +40,12 @@ $(() => {
   let arrowProcessTimerId = null;
   let arrowMoveTimerId = null;
   let runCountDownId = null;
-  let player1Score = null;
-  let player2Score = null;
+  let currentBeat = 0;
+  let numberOfPossibleArrows = 0;
+  let player1Score = 0;
+  let player1Perfects = 0;
+  let player2Score = 0;
+  let player2Perfects = 0;
   let twoPlayerMode = false;
   const keyCodes1 = {
     37: 'left',
@@ -99,18 +104,36 @@ $(() => {
     {type: [[1,4],0,0,0,0,0,0,0], bars: 1},
     {type: [0,0,4,4,4,3,3,1], bars: 1},
     {type: [1,4,3,1,1,4,1,0], bars: 1},
-    {type: [[4,1],0,[3,1],0,[4,1],0,[3,1],0], bars: 2},
-    {type: [[4,1],1,[3,1],1,[4,1],1,[3,1],1], bars: 2},
+    {type: [[4,1],1,[3,1],1,[2,1],1,[4,1],[4,1]], bars: 2},
+    {type: [[4,3],3,[4,3],3,[2,3],3,[2,3],1], bars: 2},
     {type: [0,0,0,0,4,3,1,0], bars: 3},
-    {type: [[4,3],1,[4,3],1,[4,3],1,[1,4],0], bars: 1},
+    {type: [[1,3],4,[1,3],2,[1,3],4,[1,4],0], bars: 1},
     {type: [0,0,0,0,4,3,1,0], bars: 3},
-    {type: [[4,3],1,[4,3],1,[4,3],1,[1,4],0], bars: 1},
-    
-    {type: [[4,3],1,[4,3],1,3,1,2,1], bars: 2}
+    {type: [[1,3],4,[1,3],2,[1,3],4,[1,4],0], bars: 1},
+    {type: [0,0,0,0,[4,1],[3,1],[2,1],0], bars: 3},
+    {type: [[1,3],4,[1,3],2,[1,3],4,[1,4],0], bars: 1},
+    {type: [0,0,0,0,[4,1],[3,1],[2,1],0], bars: 3},
+    {type: [[1,3],4,[1,3],2,[1,3],4,[1,4],0], bars: 1},
+    {type: [4,0,4,4,0,0,4,4], bars: 1},
+    {type: [3,0,3,3,0,0,3,3], bars: 1},
+    {type: [2,0,2,2,0,0,2,2], bars: 1},
+    {type: [[4,1],0,[4,1],[4,1],0,0,[4,1],[4,1]], bars: 1},
+    {type: [[4,3],0,[4,2],[4,1],0,0,4,4], bars: 1},
+    {type: [[3,2],0,[3,1],[3,4],0,0,3,3], bars: 1},
+    {type: [[2,1],0,[2,3],[2,4],0,0,2,2], bars: 1},
+    {type: [[4,1],0,[4,1],[4,1],0,0,[4,1],[4,1]], bars: 1},
+    {type: [4,0,4,4,0,0,4,4], bars: 1},
+    {type: [3,0,3,3,0,0,3,3], bars: 1},
+    {type: [2,0,2,2,0,0,2,2], bars: 1},
+    {type: [[4,1],0,[4,1],[4,1],0,0,[4,1],[4,1]], bars: 1},
+    {type: [4,0,4,4,0,0,4,4], bars: 1},
+    {type: [3,0,3,3,0,0,3,3], bars: 1},
+    {type: [2,0,2,2,0,0,2,2], bars: 1},
+    {type: [[1,3],4,[1,3],2,[1,3],4,[1,4],0], bars: 1},
+    {type: [[4,3],1,[4,3],1,3,1,2,1], bars: 4}
   ];
 
   $startButtonOnePlayer.on('click', () => {
-    console.log('got here');
     setTimeout(function() {
       $messageAreaPlayer1.text('');
       $titleAndButtonsOnePlayer.addClass('hidden');
@@ -118,6 +141,7 @@ $(() => {
       if(twoPlayerMode) {
         twoPlayerMode = false;
       }
+      run = true;
       setTimeout(function() {
         countSound.play();
         countDown();
@@ -161,6 +185,7 @@ $(() => {
       if(!twoPlayerMode) {
         twoPlayerSetup();
       }
+      run = true;
       setTimeout(function() {
         countSound.play();
         countDown();
@@ -215,9 +240,16 @@ $(() => {
       run = false;
       song.pause();
       song.currentTime = 0;
+      numberOfPossibleArrows = 0;
+      player1Score = 0;
+      player2Score = 0;
+      player1Perfects = 0;
+      player2Perfects = 0;
+      currentBeat = 0;
       recordScratch.play();
       clearInterval(runCountDownId);
       $messageAreaPlayer1.text('');
+      run = false;
     }, 100);
   });
 
@@ -236,7 +268,6 @@ $(() => {
         });
       }
     });
-    let currentBeat = 0;
     if(wholeSongPattern[currentBeat] > 0) {
       createArrow(wholeSongPattern[currentBeat]);
     } else if (wholeSongPattern[currentBeat].length === 2) {
@@ -284,24 +315,24 @@ $(() => {
 
   function countDown() {
     let count = 4;
-    $messageAreaPlayer1.text('Get');
-    $messageAreaPlayer2.text('Get');
-    count--;
     if(twoPlayerMode) {
+      $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>Get');
+      $messageAreaPlayer2.text('Get');
+      count--;
       runCountDownId = setInterval(function() {
         switch(count) {
           case 3:
-            $messageAreaPlayer1.text('your fingers');
+            $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>your fingers');
             $messageAreaPlayer2.text('your fingers');
             countSound.play();
             break;
           case 2:
-            $messageAreaPlayer1.text('ready to');
+            $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>ready to');
             $messageAreaPlayer2.text('ready to');
             countSound.play();
             break;
           case 1:
-            $messageAreaPlayer1.text('DANCE');
+            $messageAreaPlayer1.html('<span class="small-text">W A S D</span><br><br>DANCE');
             $messageAreaPlayer2.text('DANCE');
             countSound.play();
             break;
@@ -313,6 +344,8 @@ $(() => {
         count--;
       }, 1000 * 60/beatsPerMinute);
     } else {
+      $messageAreaPlayer1.text('Get');
+      count--;
       runCountDownId = setInterval(function() {
         switch(count) {
           case 3:
@@ -345,11 +378,15 @@ $(() => {
     song.currentTime = 0;
     recordScratch.play();
     $quitButton.text('Play again');
+    const percentage = currentBeat / beatsInSong * 100;
+    run = false;
     if(player === 'player1') {
-      $messageAreaPlayer1.text('YOU LOSE');
+      $messageAreaPlayer1.html(`YOU LOSE<br><br>You made it ${Math.floor(percentage)}% of the way through the song, hitting ${player1Score} arrows with ${player1Perfects} perfects out of a possible ${Math.round(numberOfPossibleArrows)}.`);
+      $messageAreaPlayer2.html(`YOU WIN<br><br>WELL DONE<br><br>You hit ${player2Score} arrows with ${player2Perfects} perfects out of a possible ${Math.round(numberOfPossibleArrows)}.`);
     }
     if(player === 'player2') {
-      $messageAreaPlayer2.text('YOU LOSE');
+      $messageAreaPlayer2.html(`YOU LOSE<br><br>You made it ${Math.floor(percentage)}% of the way through the song, hitting ${player2Score} arrows with ${player2Perfects} perfects out of a possible ${Math.round(numberOfPossibleArrows)} .`);
+      $messageAreaPlayer1.html(`YOU WIN<br><br>WELL DONE<br><br>You hit ${player1Score} arrows with ${player1Perfects} perfects out of a possible ${Math.round(numberOfPossibleArrows)}.`);
     }
   }
 
@@ -396,6 +433,11 @@ $(() => {
 
   function activate($arrow) {
     $arrow.addClass('active');
+    if(twoPlayerMode) {
+      numberOfPossibleArrows += 0.5;
+    } else {
+      numberOfPossibleArrows++;
+    }
   }
 
   function deActivate($arrow) {
@@ -417,68 +459,73 @@ $(() => {
   }
 
   $(window).on('keydown', (e) => {
-    const keyPressed = e.which;
-    highlight(keyPressed);
-    if(twoPlayerMode) {
-      const $activeArrow1 = $('.arrow').filter('.player-one').filter('.active');
-      const $activeArrow2 = $('.arrow').filter('.player-two').filter('.active');
-      if($activeArrow1.hasClass(keyCodes2[keyPressed])) {
-        // player1Score++;
-        $messageAreaPlayer1.text('');
-        if($activeArrow1.position().top >= $activeArea.height()/2 - $activeArrow1.height()/2 - 4 && $activeArrow1.position().top <= $activeArea.height()/2 - $activeArrow1.height()/2 + 4) {
-          $messageAreaPlayer1.text('Perfect');
-          if(player1Health < 100) {
-            player1Health += 2;
-            $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+    if(run) {
+      const keyPressed = e.which;
+      highlight(keyPressed);
+      if(twoPlayerMode) {
+        const $activeArrow1 = $('.arrow').filter('.player-one').filter('.active');
+        const $activeArrow2 = $('.arrow').filter('.player-two').filter('.active');
+        if($activeArrow1.hasClass(keyCodes2[keyPressed])) {
+          player1Score++;
+          $messageAreaPlayer1.text('');
+          if($activeArrow1.position().top >= $activeArea.height()/2 - $activeArrow1.height()/2 - 4 && $activeArrow1.position().top <= $activeArea.height()/2 - $activeArrow1.height()/2 + 4) {
+            $messageAreaPlayer1.text('Perfect');
+            player1Perfects++;
+            if(player1Health < 100) {
+              player1Health += 2;
+              $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+            }
           }
-        }
-        deActivate($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
-        deleteArrow($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
-      } else if($activeArrow2.hasClass(keyCodes1[keyPressed])) {
-        // player2Score++;
-        $messageAreaPlayer2.text('');
-        if($activeArrow2.position().top >= $activeArea.height()/2 - $activeArrow2.height()/2 - 4 && $activeArrow2.position().top <= $activeArea.height()/2 - $activeArrow2.height()/2 + 4) {
-          $messageAreaPlayer2.text('Perfect');
-          if(player2Health < 100) {
-            player2Health += 2;
-            $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
+          deActivate($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
+          deleteArrow($activeArrow1.filter(`.${keyCodes2[keyPressed]}`));
+        } else if($activeArrow2.hasClass(keyCodes1[keyPressed])) {
+          player2Score++;
+          $messageAreaPlayer2.text('');
+          if($activeArrow2.position().top >= $activeArea.height()/2 - $activeArrow2.height()/2 - 4 && $activeArrow2.position().top <= $activeArea.height()/2 - $activeArrow2.height()/2 + 4) {
+            $messageAreaPlayer2.text('Perfect');
+            player2Perfects++;
+            if(player2Health < 100) {
+              player2Health += 2;
+              $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
+            }
           }
+          deActivate($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
+          deleteArrow($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
+        } else if (keyCodes2[keyPressed] !== -1){
+          player1Health -= 2;
+          $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+        } else if (keyCodes1[keyPressed] !== -1){
+          player2Health -= 2;
+          $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
         }
-        deActivate($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
-        deleteArrow($activeArrow2.filter(`.${keyCodes1[keyPressed]}`));
-      } else if (keyCodes2[keyPressed] !== -1){
-        player1Health -= 2;
-        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
-      } else if (keyCodes1[keyPressed] !== -1){
-        player2Health -= 2;
-        $player2HealthBar.width(`${player2Health/100 * $gameAreaPlayer2.width() * 0.7}px`);
-      }
-      if(player1Health <= 0) {
-        loseGame('player1');
-      }
-      if (player2Health <= 0) {
-        loseGame('player2');
-      }
-    } else {
-      const $activeArrow = $('.arrow').filter('.active');
-      if($activeArrow.hasClass(keyCodes1[keyPressed])) {
-        // player1Score++;
-        $messageAreaPlayer1.text('');
-        if($activeArrow.position().top >= $activeArea.height()/2 - $activeArrow.height()/2 - 4 && $activeArrow.position().top <= $activeArea.height()/2 - $activeArrow.height()/2 + 4) {
-          $messageAreaPlayer1.text('Perfect');
-          if(player1Health < 100) {
-            player1Health += 2;
-            $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+        if(player1Health <= 0) {
+          loseGame('player1');
+        }
+        if (player2Health <= 0) {
+          loseGame('player2');
+        }
+      } else {
+        const $activeArrow = $('.arrow').filter('.active');
+        if($activeArrow.hasClass(keyCodes1[keyPressed])) {
+          player1Score++;
+          $messageAreaPlayer1.text('');
+          if($activeArrow.position().top >= $activeArea.height()/2 - $activeArrow.height()/2 - 4 && $activeArrow.position().top <= $activeArea.height()/2 - $activeArrow.height()/2 + 4) {
+            $messageAreaPlayer1.text('Perfect');
+            player1Perfects++;
+            if(player1Health < 100) {
+              player1Health += 2;
+              $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
+            }
           }
+          deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
+          deleteArrow($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
+        } else if (keyCodes2[keyPressed] !== -1){
+          player1Health -= 2;
+          $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
         }
-        deActivate($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
-        deleteArrow($activeArrow.filter(`.${keyCodes1[keyPressed]}`));
-      } else if (keyCodes2[keyPressed] !== -1){
-        player1Health -= 2;
-        $player1HealthBar.width(`${player1Health/100 * $gameAreaPlayer1.width() * 0.7}px`);
-      }
-      if(player1Health <= 0) {
-        loseGame('player1');
+        if(player1Health <= 0) {
+          loseGame('player1');
+        }
       }
     }
   });
