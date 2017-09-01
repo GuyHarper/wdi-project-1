@@ -100,28 +100,28 @@ div {
     background-repeat: no-repeat;
     background-position: center;
     &.left {
-      background-image: url('../images/left-arrow-icon-grey.png');
+      background-image: url('/public/images/left-arrow-icon-grey.png');
       left: calc((#{$game-width} * 7/10 * 1/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
       &.pressed {
         left: calc((#{$game-width} * 7/10 * 1/8 - #{$arrow-width} * 1.1/2) + #{$game-width} * 15/100);
       }
     }
     &.up {
-      background-image: url('../images/up-arrow-icon-grey.png');
+      background-image: url('/public/images/up-arrow-icon-grey.png');
       left: calc((#{$game-width} * 7/10 * 3/8 - #{$arrow-width} / 2) + #{$game-width} * 15/100);
       &.pressed {
         left: calc((#{$game-width} * 7/10 * 3/8 - #{$arrow-width} * 1.1/2) + #{$game-width} * 15/100);
       }
     }
     &.down {
-      background-image: url('../images/down-arrow-icon-grey.png');
+      background-image: url('/public/images/down-arrow-icon-grey.png');
       left: calc((#{$game-width} * 7/10 * 5/8 - #{$arrow-width} / 2) + #{$game-width} * 15/100);
       &.pressed {
         left: calc((#{$game-width} * 7/10 * 5/8 - #{$arrow-width} * 1.1/2) + #{$game-width} * 15/100);
       }
     }
     &.right {
-      background-image: url('../images/right-arrow-icon-grey.png');
+      background-image: url('/public/images/right-arrow-icon-grey.png');
       left: calc((#{$game-width} * 7/10 * 7/8 - #{$arrow-width} / 2) + #{$game-width} * 15/100);
       &.pressed {
         left: calc((#{$game-width} * 7/10 * 7/8 - #{$arrow-width} * 1.1/2) + #{$game-width} * 15/100);
@@ -140,19 +140,19 @@ div {
     background-repeat: no-repeat;
     background-position: center;
     &.left {
-      background-image: url('../images/left-arrow-icon-white.png');
+      background-image: url('/public/images/left-arrow-icon-white.png');
       left: calc((#{$game-width} * 7/10 * 1/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
     &.up {
-      background-image: url('../images/up-arrow-icon-white.png');
+      background-image: url('/public/images/up-arrow-icon-white.png');
       left: calc((#{$game-width} * 7/10 * 3/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
     &.down {
-      background-image: url('../images/down-arrow-icon-white.png');
+      background-image: url('/public/images/down-arrow-icon-white.png');
       left: calc((#{$game-width} * 7/10 * 5/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
     &.right {
-      background-image: url('../images/right-arrow-icon-white.png');
+      background-image: url('/public/images/right-arrow-icon-white.png');
       left: calc((#{$game-width} * 7/10 * 7/8 - #{$arrow-width}/2) + #{$game-width} * 15/100);
     }
   }
